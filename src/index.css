@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+@theme {
+  /* Keyframes */
+  @keyframes toast-in {
+    0% {
+      transform: translateX(100%) scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes toast-out {
+    0% {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100%) scale(0.9);
+      opacity: 0;
+    }
+  }
+  @keyframes toast-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-4px);
+    }
+    40% {
+      transform: translateX(3px);
+    }
+    60% {
+      transform: translateX(-2px);
+    }
+    80% {
+      transform: translateX(1px);
+    }
+  }
+  @keyframes toast-flip {
+    0% {
+      opacity: 0;
+      transform: perspective(600px) rotateX(-15deg) translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: perspective(600px) rotateX(0deg) translateY(0);
+    }
+  }
+  @keyframes progress-shrink {
+    0% {
+      transform: scaleX(1);
+    }
+    100% {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes btn-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  @keyframes btn-pop {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* Animaciones */
+  --animate-toast-in: toast-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-toast-out: toast-out 0.3s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+  --animate-toast-shake: toast-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)
+    forwards;
+  --animate-toast-flip: toast-flip 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-progress-bar: progress-shrink 10s linear forwards;
+  --animate-btn-pulse: btn-pulse 1.5s infinite ease-in-out;
+  --animate-btn-pop: btn-pop 0.3s ease-out forwards;
+
+  /* Colores */
+  --color-vgsred: #c30e1a;
+  --color-vgsred-500: #c30e1a;
+  --color-vgswhite: #ffffff;
+  --color-vgsdarkblue: #0c224b;
+  --color-vgsgray: #b1b1b1;
+  --color-vgsblack: #000000;
+  --color-vgspurple: #9500ff;
+
+  --color-red-500: #c30e1a;
+  --color-red-600: #a10b15;
+}
+
+@layer base {
+  :root {
+    font-family: "Poppins", Inter, system-ui, sans-serif;
+    background-color: #f9fafb;
+  }
+}
+
+@utility hover-gradient {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: none;
+  }
+
+  &:hover::after {
+    left: 100%;
+    transition: left 0.6s ease-in-out;
+  }
+}
+
+@layer utilities {
+  .fill-orange-500 {
+    fill: #f97316 !important;
+  }
+  .bg-orange-500 {
+    background-color: #f97316 !important;
+  }
+
+  .fill-yellow-500 {
+    fill: #eab308 !important;
+  }
+  .bg-yellow-500 {
+    background-color: #eab308 !important;
+  }
+
+  .fill-purple-500 {
+    fill: #a855f7 !important;
+  }
+  .bg-purple-500 {
+    background-color: #a855f7 !important;
+  }
+
+  .fill-green-500 {
+    fill: oklch(72.3% 0.219 149.579) !important;
+  }
+  .bg-green-500 {
+    background-color: oklch(72.3% 0.219 149.579) !important;
+  }
+
+  .fill-red-500 {
+    fill: var(--color-vgsred) !important;
+  }
+  .bg-red-500 {
+    background-color: var(--color-vgsred) !important;
+  }
+
+  .fill-cyan-500 {
+    fill: oklch(71.5% 0.143 215.221) !important;
+  }
+  .bg-cyan-500 {
+    background-color: oklch(71.5% 0.143 215.221) !important;
+  }
+
+  .fill-indigo-500 {
+    fill: oklch(58.5% 0.233 277.117) !important;
+  }
+  .bg-indigo-500 {
+    background-color: oklch(58.5% 0.233 277.117) !important;
+  }
+
+  .streaming-cursor::after {
+    content: "|";
+    display: inline;
+    animation: blink 0.7s infinite;
+    color: #6366f1;
+    font-weight: bold;
+  }
+}
