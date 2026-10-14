@@ -1,13 +1,16 @@
 # syntax=docker/dockerfile:1.4
 # ==========================================
-# Stage 1: Build (Node.js)
+# Stage 1: Build (Node.js - Debian Slim con glibc)
 # ==========================================
-FROM node:22-alpine AS builder
+FROM node:22-slim AS builder
 WORKDIR /app
+
+# Variables de entorno para optimizar memoria en build
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 # Cacheo de dependencias
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --no-audit
 
 # Variables de entorno de compilación de Vite
 ARG VITE_API_URL=https://api.ventureglobalsolution.com/api
