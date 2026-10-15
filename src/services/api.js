@@ -351,7 +351,8 @@ class ApiService {
   }
 
   async confirmAttendance(token, eventId, attended) {
-    return this.post(`events/${eventId}/attendance`, { attended }, token);
+    const status = attended ? "attended" : "absent";
+    return this.post(`events/${eventId}/attendance`, { status, attended: Boolean(attended) }, token);
   }
 
   async bulkConfirmAttendance(token, eventId, attendees) {
