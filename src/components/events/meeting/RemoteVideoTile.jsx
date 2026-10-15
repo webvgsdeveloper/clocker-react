@@ -22,7 +22,7 @@ const RemoteVideoTile = memo(
         }
         videoRef.current.play().catch(() => {});
       }
-    }, [peer.stream]);
+    }, [peer.stream, peer.is_video_off]);
 
     const hasVideoTrack =
       !peer.is_video_off &&
@@ -49,6 +49,7 @@ const RemoteVideoTile = memo(
           autoPlay
           playsInline
           muted={true}
+          onLoadedMetadata={() => videoRef.current?.play().catch(() => {})}
           className={`w-full h-full ${
             peer.is_sharing ? "object-contain bg-black" : "object-cover"
           } ${hasVideoTrack ? "block" : "hidden"}`}

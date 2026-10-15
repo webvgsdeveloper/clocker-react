@@ -216,6 +216,15 @@ export const CallProvider = ({ children }) => {
         `[CallContext] Initiating connection with socket ${remoteSocketId} (initiator: ${isInitiator})`,
       );
 
+      if (
+        peerConnectionRef.current &&
+        peerConnectionRef.current.connectionState !== "closed" &&
+        remoteSocketIdRef.current === remoteSocketId
+      ) {
+        console.log("[CallContext] Reutilizando RTCPeerConnection activa para:", remoteSocketId);
+        return peerConnectionRef.current;
+      }
+
       if (peerConnectionRef.current) {
         try {
           peerConnectionRef.current.close();
@@ -265,7 +274,16 @@ export const CallProvider = ({ children }) => {
         } else {
           remoteStreamRef.current = incomingStream;
         }
-        setRemoteStream(incomingStream);
+
+        event.track.onunmute = () => {
+          setRemoteStream(new MediaStream(incomingStream.getTracks()));
+          setStreamVersion((v) => v + 1);
+        };
+        event.track.onmute = () => {
+          setStreamVersion((v) => v + 1);
+        };
+
+        setRemoteStream(new MediaStream(incomingStream.getTracks()));
         setStreamVersion((v) => v + 1);
       };
 
@@ -342,20 +360,29 @@ export const CallProvider = ({ children }) => {
           callRoomId,
         );
 
-        const myStream = await navigator.mediaDevices.getUserMedia({
-          video: isVideo
-            ? {
-                width: { ideal: 1280, max: 1920 },
-                height: { ideal: 720, max: 1080 },
-                frameRate: { ideal: 30 },
-              }
-            : false,
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          },
-        });
+        let myStream;
+        try {
+          myStream = await navigator.mediaDevices.getUserMedia({
+            video: isVideo
+              ? {
+                  facingMode: "user",
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 },
+                }
+              : false,
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            },
+          });
+        } catch (_devErr) {
+          console.warn("[CallContext] Fallback a restricciones basicas en startCall:", _devErr);
+          myStream = await navigator.mediaDevices.getUserMedia({
+            video: isVideo,
+            audio: true,
+          });
+        }
 
         localStreamRef.current = myStream;
         setStream(myStream);
@@ -424,20 +451,29 @@ export const CallProvider = ({ children }) => {
         callRoomId,
       );
 
-      const myStream = await navigator.mediaDevices.getUserMedia({
-        video: isVideo
-          ? {
-              width: { ideal: 1280, max: 1920 },
-              height: { ideal: 720, max: 1080 },
-              frameRate: { ideal: 30 },
-            }
-          : false,
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
+      let myStream;
+      try {
+        myStream = await navigator.mediaDevices.getUserMedia({
+          video: isVideo
+            ? {
+                facingMode: "user",
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+              }
+            : false,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+      } catch (_devErr) {
+        console.warn("[CallContext] Fallback a restricciones basicas en acceptCall:", _devErr);
+        myStream = await navigator.mediaDevices.getUserMedia({
+          video: isVideo,
+          audio: true,
+        });
+      }
 
       localStreamRef.current = myStream;
       setStream(myStream);
@@ -826,6 +862,12 @@ export const CallProvider = ({ children }) => {
       cleanupMediaAndPeer();
     };
 
+    const handleCallHandledElsewhere = () => {
+      console.log("[CallContext] Llamada atendida en otra pestaña o dispositivo");
+      cleanupMediaAndPeer();
+    };
+
+    socket.on("call_handled_elsewhere", handleCallHandledElsewhere);
     socket.on("incoming_call", handleIncomingCall);
     socket.on("call_accepted", handleCallAccepted);
     socket.on("call_busy_response", handleCallBusyResponse);
@@ -840,6 +882,7 @@ export const CallProvider = ({ children }) => {
     socket.on("meeting_peer_left", handleMeetingPeerLeft);
 
     return () => {
+      socket.off("call_handled_elsewhere", handleCallHandledElsewhere);
       socket.off("incoming_call", handleIncomingCall);
       socket.off("call_accepted", handleCallAccepted);
       socket.off("call_busy_response", handleCallBusyResponse);

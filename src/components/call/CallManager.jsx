@@ -126,7 +126,7 @@ const CallManager = () => {
     if (callType !== "video" || !remoteStream) return false;
     const tracks = remoteStream.getVideoTracks();
     return tracks.length > 0 && tracks.some((t) => t.enabled);
-  }, [callType, remoteStream]);
+  }, [callType, remoteStream, streamVersion]);
 
   // Check if local video track is active
   const hasLocalVideo = useMemo(() => {
@@ -351,6 +351,7 @@ const CallManager = () => {
                     autoPlay
                     playsInline
                     muted={true}
+                    onLoadedMetadata={() => remoteVideoRef.current?.play().catch(() => {})} 
                     className={`w-full h-full ${
                       isMinimized ? "object-cover" : "object-contain bg-black"
                     } ${hasRemoteVideo ? "block" : "hidden"}`}

@@ -47,6 +47,7 @@ export const MeetingProvider = ({ children }) => {
 
   // WebRTC multi-peer connections: { [socket_id]: RTCPeerConnection }
   const peerConnections = useRef({});
+  const pendingIceCandidates = useRef({});
 
   // Remote peers information: { [socket_id]: { socket_id, stream, user_id, name, profile_picture, is_host, is_audio_muted, is_video_off, is_sharing } }
   const [remotePeers, setRemotePeers] = useState({});
@@ -80,6 +81,7 @@ export const MeetingProvider = ({ children }) => {
       }
     });
     peerConnections.current = {};
+    pendingIceCandidates.current = {};
 
     // Stop screen share if any
     if (screenStreamRef.current) {
@@ -163,8 +165,14 @@ export const MeetingProvider = ({ children }) => {
           `[MeetingContext] Remote track received from ${remoteSocketId}:`,
           event.streams[0]
         );
-        const remoteStream = event.streams[0];
-        updatePeerStream(remoteSocketId, remoteStream, peerInfo);
+        let remoteStream = event.streams[0];
+        if (!remoteStream) {
+          remoteStream = new MediaStream([event.track]);
+        }
+        event.track.onunmute = () => {
+          updatePeerStream(remoteSocketId, new MediaStream(remoteStream.getTracks()), peerInfo);
+        };
+        updatePeerStream(remoteSocketId, new MediaStream(remoteStream.getTracks()), peerInfo);
       };
 
       // Store initial peer metadata if provided
@@ -218,7 +226,16 @@ export const MeetingProvider = ({ children }) => {
       };
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (_mErr) {
+          console.warn("[MeetingContext] Fallback a restricciones basicas:", _mErr);
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: meetingType === "video",
+          });
+        }
         if (muteOnEntry) {
           stream.getAudioTracks().forEach((t) => (t.enabled = false));
           setIsAudioMuted(true);
@@ -467,6 +484,20 @@ export const MeetingProvider = ({ children }) => {
       }
     };
 
+    const drainIceCandidates = async (socketId, pc) => {
+      const queued = pendingIceCandidates.current[socketId];
+      if (queued && queued.length > 0 && pc) {
+        delete pendingIceCandidates.current[socketId];
+        for (const c of queued) {
+          try {
+            await pc.addIceCandidate(new RTCIceCandidate(c));
+          } catch (e) {
+            console.warn(`[MeetingContext] Error aplicando candidato encolado de ${socketId}:`, e);
+          }
+        }
+      }
+    };
+
     // 3. WebRTC Offer received
     const handleSignalOffer = async ({ from_socket_id, offer, from_user }) => {
       if (!isJoinedRef.current || !activeMeetingRef.current) return;
@@ -476,6 +507,7 @@ export const MeetingProvider = ({ children }) => {
       }
       try {
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        await drainIceCandidates(from_socket_id, pc);
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
 
@@ -504,6 +536,7 @@ export const MeetingProvider = ({ children }) => {
       if (pc) {
         try {
           await pc.setRemoteDescription(new RTCSessionDescription(answer));
+          await drainIceCandidates(from_socket_id, pc);
         } catch (err) {
           console.error(
             `[MeetingContext] Error setting remote answer from ${from_socket_id}:`,
@@ -513,19 +546,26 @@ export const MeetingProvider = ({ children }) => {
       }
     };
 
-    // 5. ICE Candidate received
+    // 5. ICE Candidate received (con buffer temporal)
     const handleSignalIce = async ({ from_socket_id, candidate }) => {
-      if (!isJoinedRef.current || !activeMeetingRef.current) return;
+      if (!isJoinedRef.current || !activeMeetingRef.current || !candidate) return;
       const pc = peerConnections.current[from_socket_id];
-      if (pc && candidate) {
-        try {
-          await pc.addIceCandidate(new RTCIceCandidate(candidate));
-        } catch (err) {
-          console.warn(
-            `[MeetingContext] Error adding ICE candidate from ${from_socket_id}:`,
-            err
-          );
+
+      if (!pc || !pc.remoteDescription || !pc.remoteDescription.type) {
+        if (!pendingIceCandidates.current[from_socket_id]) {
+          pendingIceCandidates.current[from_socket_id] = [];
         }
+        pendingIceCandidates.current[from_socket_id].push(candidate);
+        return;
+      }
+
+      try {
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch (err) {
+        console.warn(
+          `[MeetingContext] Error adding ICE candidate from ${from_socket_id}:`,
+          err
+        );
       }
     };
 
