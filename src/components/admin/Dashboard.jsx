@@ -1,5 +1,5 @@
 // src/components/admin/Dashboard.jsx
-import React, { lazy, Suspense, memo, useCallback } from "react";
+import { lazy, Suspense, memo, useCallback } from "react";
 import {
   faUserPlus,
   faTimeline,

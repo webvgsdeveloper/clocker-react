@@ -1,5 +1,4 @@
 // src/components/events/meeting/MeetingParticipantsDrawer.jsx
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

@@ -1,5 +1,5 @@
 // src/contexts/MeetingContext.jsx
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -617,7 +617,7 @@ export const MeetingProvider = ({ children }) => {
       socket.off("meeting_peer_left", handlePeerLeft);
       socket.off("meeting_ended_by_host", handleMeetingEndedByHost);
     };
-  }, [socket, user?.user_id]);
+  }, [socket, user]);
 
   // Warn on beforeunload if user is in an active meeting
   useEffect(() => {

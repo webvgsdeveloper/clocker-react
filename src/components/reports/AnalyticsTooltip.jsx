@@ -1,5 +1,4 @@
 // src/components/reports/AnalyticsTooltip.jsx
-import React from "react";
 import { motion } from "framer-motion";
 import { tooltipVariants } from "../common/animations";
 import StatusBadge from "../common/StatusBadge";

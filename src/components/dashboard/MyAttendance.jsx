@@ -1,10 +1,8 @@
 // src/components/dashboard/MyAttendance.jsx
-import React, {
+import {
   useState,
   useMemo,
   useCallback,
-  useRef,
-  useEffect,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -12,25 +10,15 @@ import {
   BarChart,
   AreaChart,
   Subtitle,
-  Grid,
-  Metric,
-  Text,
-  Flex,
 } from "@tremor/react";
 import {
   faFilter,
   faCalendarDays,
   faBroom,
-  faExclamationTriangle,
   faHourglassHalf,
   faAlarmClock,
-  faCheckCircle,
-  faChevronLeft,
-  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion, AnimatePresence } from "framer-motion";
-import { formatDuration } from "../../utils/formatters.js";
 import api from "../../services/api";
 import { STATUS_CONFIG } from "../layout/statusConfig";
 import DateRangePicker from "../common/DateRangePicker";
@@ -41,7 +29,6 @@ import Badge from "../common/Badge";
 import Card from "../common/Card";
 import {
   fadeInUp,
-  tooltipVariants,
   staggerContainer,
 } from "../common/animations";
 

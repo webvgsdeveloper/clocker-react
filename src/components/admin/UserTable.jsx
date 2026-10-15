@@ -1,5 +1,5 @@
 // src/components/admin/UserTable.jsx
-import React, { memo, useState, forwardRef } from "react";
+import { memo, useState, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "../common/Button";
 import Badge from "../common/Badge";

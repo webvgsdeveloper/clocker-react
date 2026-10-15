@@ -1,5 +1,5 @@
 // src/components/ai/ClockerIA.jsx
-import React, { useState, useEffect, useRef, memo, useCallback } from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,14 +32,14 @@ const MessageItem = memo(({ message, currentUserId }) => {
       className={`flex ${isMe ? "justify-end" : "justify-start"}`}
     >
       <div
-        className={`max-w-[85%] p-3.5 rounded-2xl shadow-sm ${
+        className={`max-w-[85%] min-w-0 p-3.5 rounded-2xl shadow-sm wrap-anywhere ${
           isMe
             ? "bg-vgsdarkblue text-white rounded-tr-none"
             : "bg-white text-vgsblack border border-vgsgray/20 rounded-tl-none"
         }`}
       >
         <div
-          className={`prose prose-sm max-w-none ${isMe ? "prose-invert" : "prose-slate"} text-[12px] leading-relaxed`}
+          className={`prose prose-sm max-w-none ${isMe ? "prose-invert" : "prose-slate"} text-[12px] leading-relaxed wrap-anywhere`}
         >
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {message.message}

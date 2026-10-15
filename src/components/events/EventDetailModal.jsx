@@ -1,5 +1,5 @@
 // src/components/events/EventDetailModal.jsx
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   faCalendarCheck,

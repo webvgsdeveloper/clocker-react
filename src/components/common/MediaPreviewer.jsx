@@ -1,5 +1,4 @@
 // src/components/common/MediaPreviewer.jsx
-import React from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import {
   faTimes,

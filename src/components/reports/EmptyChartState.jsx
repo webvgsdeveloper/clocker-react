@@ -1,5 +1,4 @@
 // src/components/reports/EmptyChartState.jsx
-import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInbox } from "@fortawesome/free-solid-svg-icons";
 

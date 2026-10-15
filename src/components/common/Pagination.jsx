@@ -1,5 +1,4 @@
 // components/common/Pagination.jsx
-import React from "react";
 import Button from "./Button";
 import {
   faChevronLeft,

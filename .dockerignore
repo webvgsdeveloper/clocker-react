@@ -17,7 +17,7 @@ pnpm-debug.log*
 .git/
 .gitignore
 
-# Environment files
+# Env
 .env
 .env.local
 .env*.local

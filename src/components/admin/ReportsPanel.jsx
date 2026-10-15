@@ -1,10 +1,8 @@
 // src/components/admin/ReportPanel.jsx
-import React, {
+import {
   useState,
   useMemo,
   useCallback,
-  useRef,
-  useEffect,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -12,10 +10,6 @@ import {
   BarChart,
   AreaChart,
   Subtitle,
-  Flex,
-  Grid,
-  Metric,
-  Text,
 } from "@tremor/react";
 import {
   faFileExcel,
@@ -24,20 +18,13 @@ import {
   faFilter,
   faBroom,
   faCalendarDays,
-  faClock,
-  faExclamationTriangle,
   faHourglassHalf,
   faAlarmClock,
-  faUsers,
-  faChevronLeft,
-  faChevronRight,
-  faInbox,
   faBorderNone,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { saveAs } from "file-saver";
 import { motion, AnimatePresence } from "framer-motion";
-import { formatDuration } from "../../utils/formatters.js";
 import api from "../../services/api";
 import { STATUS_CONFIG } from "../layout/statusConfig";
 import DateRangePicker from "../common/DateRangePicker";
@@ -49,7 +36,6 @@ import ConfirmationBox from "../common/ConfirmationBox";
 import Card from "../common/Card";
 import {
   fadeInUp,
-  tooltipVariants,
   staggerContainer,
 } from "../common/animations";
 

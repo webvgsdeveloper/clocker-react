@@ -1,5 +1,5 @@
 // src/components/events/meeting/LocalVideoTile.jsx
-import React, { useRef, useEffect, memo } from "react";
+import { useRef, useEffect, memo } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

@@ -1,7 +1,8 @@
-import React, {
+import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   memo,
   Suspense,
 } from "react";
@@ -115,7 +116,7 @@ const UserTimelineModal = ({ user, onClose, token }) => {
     fetchHistory();
   }, [fetchHistory]);
 
-  const currentStatusStartTime = React.useMemo(() => {
+  const currentStatusStartTime = useMemo(() => {
     const userDate = parseSafeDate(user.last_update);
     if (userDate) return userDate;
 

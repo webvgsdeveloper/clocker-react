@@ -1,5 +1,5 @@
 // src/components/profile/EditProfileModal.jsx
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { motion, useDragControls } from "framer-motion";
 import { useNotification } from "../../contexts/NotificationContext";
 import {

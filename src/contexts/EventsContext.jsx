@@ -1,5 +1,5 @@
 // src/contexts/EventsContext.jsx
-import React, {
+import {
   createContext,
   useContext,
   useState,

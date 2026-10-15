@@ -1,5 +1,4 @@
 // src/components/common/MediaMessage.jsx
-import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileAlt,
@@ -9,7 +8,7 @@ import api from "../../services/api";
 import Image from "./Image";
 import Button from "./Button";
 
-const MediaMessage = ({ fileUrl, fileType, fileName, _isMe, onPreview }) => {
+const MediaMessage = ({ fileUrl, fileType, fileName, onPreview }) => {
   const fullUrl = api.getFileUrl(fileUrl);
 
   const handlePreview = (e) => {
@@ -49,10 +48,15 @@ const MediaMessage = ({ fileUrl, fileType, fileName, _isMe, onPreview }) => {
   }
 
   return (
-    <Button onClick={handlePreview} className="text-vgswhite" icon={faFileAlt} iconClassName="text-xl">
-      <div className="flex-1 min-w-0">
-        {fileName}
-        <p className=" text-xs text-vgwwhite opacity-70">Click to preview</p>
+    <Button
+      onClick={handlePreview}
+      className="text-vgswhite max-w-full"
+      icon={faFileAlt}
+      iconClassName="text-xl"
+    >
+      <div className="flex-1 min-w-0 text-left">
+        <p className="truncate text-sm font-medium">{fileName}</p>
+        <p className="text-xs text-vgswhite/70">Click to preview</p>
       </div>
     </Button>
   );
