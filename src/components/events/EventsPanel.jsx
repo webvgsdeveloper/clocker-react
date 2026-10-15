@@ -107,7 +107,8 @@ const EventsPanel = () => {
 
       const res = await api.getEvents(token, params);
       if (res?.success) {
-        setEvents(res.data || []);
+        const list = Array.isArray(res.data) ? res.data : [];
+        setEvents(list);
         if (res.pagination) {
           setPagination((prev) => ({
             ...prev,
