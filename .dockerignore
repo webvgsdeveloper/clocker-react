@@ -1,7 +1,7 @@
 # Dependencies
 node_modules/
 
-# Production build
+# Build
 dist/
 dist-ssr/
 
@@ -22,18 +22,15 @@ pnpm-debug.log*
 .env.local
 .env*.local
 
-# Editor and IDE directories
+# IDE
 .vscode/
 .idea/
 .DS_Store
 
-# AI and Agent artifacts
+# AI 
 .gemini/
 .geminiignore
 .agents/
 
-# Playwright MCP artifacts
+# Playwright
 .playwright-mcp/
-
-# Local SSL certificates
-*.pem

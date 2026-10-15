@@ -45,7 +45,6 @@ export const CallProvider = ({ children }) => {
   const { socket, user } = useAuth();
   const { addNotification } = useNotification();
 
-  // Call status: "idle" | "calling" | "receiving" | "active"
   const [callStatus, setCallStatus] = useState("idle");
   const [callType, setCallType] = useState(null);
   const [callerInfo, setCallerInfo] = useState(null);
@@ -57,8 +56,6 @@ export const CallProvider = ({ children }) => {
   const [isCamOff, setIsCamOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isReconnecting, setIsReconnecting] = useState(false);
-
-  // Restore call session if refreshed within 60 seconds
   const [resumableCall, setResumableCall] = useState(() => {
     try {
       const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
