@@ -1,18 +1,15 @@
 # syntax=docker/dockerfile:1.4
-# ==========================================
-# Stage 1: Build (Node.js - Debian Slim con glibc)
-# ==========================================
+# Build
 FROM node:22-slim AS builder
 WORKDIR /app
 
-# Variables de entorno para optimizar memoria en build
+# ENV
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
-# Cacheo de dependencias
 COPY package*.json ./
 RUN npm ci --no-audit
 
-# Variables de entorno de compilación de Vite
+# ENV
 ARG VITE_API_URL=https://api.ventureglobalsolution.com/api
 ARG VITE_SOCKET_URL=https://api.ventureglobalsolution.com
 ARG VITE_BASE_PATH=/
@@ -23,13 +20,10 @@ ENV VITE_SOCKET_URL=$VITE_SOCKET_URL
 ENV VITE_BASE_PATH=$VITE_BASE_PATH
 ENV VITE_ALLOWED_IPS=$VITE_ALLOWED_IPS
 
-# Copiar código fuente y compilar estáticos en /dist
 COPY . .
 RUN npm run build
 
-# ==========================================
-# Stage 2: Runtime (NGINX Alpine No-Root)
-# ==========================================
+# NGINX Alpine No-Root
 FROM nginx:1.27-alpine-slim AS runner
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
