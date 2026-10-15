@@ -1,5 +1,4 @@
 // src/components/common/ConfirmationBox.jsx
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "./Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

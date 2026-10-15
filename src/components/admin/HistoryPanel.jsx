@@ -1,5 +1,5 @@
 // components/admin/HistoryPanel.jsx
-import React, { useState, useEffect, useRef, useCallback, memo } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion"; 
 import api from "../../services/api";
 import Card from "../common/Card";

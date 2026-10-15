@@ -1,5 +1,5 @@
 // src/components/common/Input.jsx
-import React, { forwardRef, useId, useState, useEffect } from "react";
+import { forwardRef, useId, useState, useEffect, cloneElement } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 
@@ -152,7 +152,7 @@ const Input = forwardRef(
             </select>
           ) : children ? (
             <div className="w-full" id={inputId}>
-              {React.cloneElement(children, {
+              {cloneElement(children, {
                 onFocus: (e) => {
                   handleFocus(e);
                   if (children.props.onFocus) children.props.onFocus(e);

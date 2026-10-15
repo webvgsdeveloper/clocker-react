@@ -1,5 +1,5 @@
 // src/components/common/LoadingFallback.jsx
-import React, { useEffect, useId } from "react";
+import { useEffect, useId } from "react";
 import { useNotification } from "../../contexts/NotificationContext";
 
 const LoadingFallback = ({ 

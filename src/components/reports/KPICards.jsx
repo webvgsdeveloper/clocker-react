@@ -1,5 +1,5 @@
 // src/components/reports/KPICards.jsx
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Grid, Card, Flex, Metric, Text } from "@tremor/react";
 import {
   faClock,
@@ -13,7 +13,10 @@ import Badge from "../common/Badge";
 import { formatAxisValue, KPI_COLOR_MAP } from "./analyticsConfig";
 
 const KPICards = ({ chartData, data, isSingleUser = false }) => {
-  const effectiveData = chartData || data || [];
+  const effectiveData = useMemo(
+    () => chartData || data || [],
+    [chartData, data],
+  );
   const effectiveSingleUser = isSingleUser || Boolean(data);
 
   const stats = useMemo(() => {

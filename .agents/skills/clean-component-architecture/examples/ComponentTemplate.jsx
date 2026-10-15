@@ -1,5 +1,5 @@
 // src/components/examples/ComponentTemplate.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faRefresh } from "@fortawesome/free-solid-svg-icons";

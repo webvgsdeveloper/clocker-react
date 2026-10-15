@@ -1,5 +1,4 @@
 // src/components/events/meeting/MeetingControls.jsx
-import React from "react";
 import {
   faMicrophone,
   faMicrophoneSlash,

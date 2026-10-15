@@ -1,5 +1,5 @@
 // src/components/admin/UserStatusCard.jsx
-import React, { memo } from "react";
+import { memo } from "react";
 import { motion } from "framer-motion";
 import Card from "../common/Card";
 import StatusBadge from "../common/StatusBadge";

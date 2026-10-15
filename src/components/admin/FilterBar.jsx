@@ -1,5 +1,5 @@
 //components/admin/FilterBar.jsx
-import React, { memo } from "react";
+import { memo } from "react";
 import { STATUS_CONFIG } from "../layout/statusConfig";
 import Input from "../common/Input";
 import Button from "../common/Button";

@@ -1,5 +1,4 @@
 // src/components/common/StatusBadge.jsx
-import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { STATUS_CONFIG } from "../layout/statusConfig";
 

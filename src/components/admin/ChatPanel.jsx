@@ -1,5 +1,5 @@
 // src/components/admin/ChatPanel.jsx
-import React, { useState, useEffect, useRef, Suspense, memo, useCallback } from "react";
+import { useState, useEffect, useRef, Suspense, memo, useCallback, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -11,14 +11,13 @@ import StatusBadge from "../common/StatusBadge";
 import Badge from "../common/Badge";
 import Image from "../common/Image";
 import Input from "../common/Input";
-import MediaMessage from "../common/MediaMessage";
+import ChatMessageItem from "./ChatMessageItem";
 import MediaPreviewer from "../common/MediaPreviewer";
 import LoadingFallback from "../common/LoadingFallback";
 import {
   panelVariants,
   staggerContainer,
   listItemVariants,
-  popIn
 } from "../common/animations";
 import {
   faPaperPlane,
@@ -36,7 +35,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 // Alias para mantener compatibilidad con nombres anteriores
 const contactListVariants = staggerContainer(0.08);
@@ -83,16 +82,16 @@ const ChatHeader = ({
   showCallDropdown,
   setShowCallDropdown,
 }) => (
-  <header className="py-2 px-3 border-b border-vgsgray/50 flex justify-between items-center bg-gray-50/50">
-    <div className="flex items-center gap-3">
+  <header className="py-2 px-3 border-b border-vgsgray/50 flex justify-between items-center bg-gray-50/50 gap-2">
+    <div className="flex items-center gap-3 min-w-0">
       <Image
         src={api.getFileUrl(contact.profile_picture, contact.name)}
         alt={contact.name}
-        className="w-7"
+        className="w-7 shrink-0"
       />
-      <p className="font-bold text-vgsblack">{contact.name}</p>
+      <p className="font-bold text-vgsblack truncate">{contact.name}</p>
     </div>
-    <div className="flex gap-2">
+    <div className="flex gap-2 shrink-0">
       <div className="relative">
         <Button
           onClick={() => setShowCallDropdown(!showCallDropdown)}
@@ -320,7 +319,7 @@ const ChatPanel = ({ token, currentUser, filters }) => {
       initial="hidden"
       animate="visible"
       variants={panelVariants}
-      className="flex h-[calc(100vh-300px)] min-h-125 bg-white rounded-xl shadow-lg border border-vgsgray/30 overflow-hidden"
+      className="flex h-[calc(100vh-300px)] min-h-125 bg-white rounded-xl shadow-lg border border-vgsgray/30 overflow-hidden w-full"
     >
       <MediaPreviewer
         isOpen={previewData.isOpen}
@@ -329,7 +328,7 @@ const ChatPanel = ({ token, currentUser, filters }) => {
         fileType={previewData.type}
         fileName={previewData.name}
       />
-      <aside className="w-full sm:w-1/3 border-r border-vgsgray/20 bg-gray-50 flex flex-col">
+      <aside className="w-full sm:w-1/3 shrink-0 border-r border-vgsgray/20 bg-gray-50 flex flex-col">
         <Badge
           variant="red"
           icon={faAddressBook}
@@ -355,7 +354,7 @@ const ChatPanel = ({ token, currentUser, filters }) => {
           ))}
         </motion.div>
       </aside>
-      <main className="hidden sm:flex flex-1 flex-col bg-vgswhite">
+      <main className="hidden sm:flex flex-1 min-w-0 flex-col bg-vgswhite">
         <AnimatePresence mode="wait">
           {selectedContact ? (
             <motion.div
@@ -364,7 +363,7 @@ const ChatPanel = ({ token, currentUser, filters }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-1 flex-col overflow-hidden"
+              className="flex flex-1 min-w-0 flex-col overflow-hidden"
             >
               <ChatHeader
                 contact={selectedContact}
@@ -381,54 +380,16 @@ const ChatPanel = ({ token, currentUser, filters }) => {
                   )
                 }
               />
-              <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-vgsgray-50/30">
+              <div className="flex-1 min-w-0 p-4 overflow-y-auto overflow-x-hidden space-y-4 bg-vgsgray-50/30">
                 <AnimatePresence initial={false}>
-                  {messages.map((m) => {
-                    const isMe =
-                      Number(m.sender_id) === Number(currentUser?.user_id);
-                    return (
-                      <motion.article
-                        key={m.id}
-                        variants={popIn}
-                        initial="hidden"
-                        animate="visible"
-                        className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`max-w-[75%] p-3 rounded-2xl shadow-sm text-sm ${
-                            isMe
-                              ? "bg-vgsdarkblue text-vgswhite rounded-tr-none"
-                              : "bg-vgswhite text-vgsblack rounded-tl-none border border-vgsgray/20"
-                          }`}
-                        >
-                          {m.file_url && (
-                            <MediaMessage
-                              fileUrl={m.file_url}
-                              fileType={m.file_type}
-                              fileName={m.file_name}
-                              isMe={isMe}
-                              onPreview={openPreview}
-                            />
-                          )}
-                          {m.message && (
-                            <p
-                              className={`${m.file_url ? "mt-2" : ""} leading-relaxed`}
-                            >
-                              {m.message}
-                            </p>
-                          )}
-                          <p
-                            className={`text-[9px] mt-1 text-right opacity-60 ${isMe ? "text-vgswhite" : "text-vgsgray"}`}
-                          >
-                            {new Date(m.created_at).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                        </div>
-                      </motion.article>
-                    );
-                  })}
+                  {messages.map((m) => (
+                    <ChatMessageItem
+                      key={m.id}
+                      message={m}
+                      currentUserId={currentUser?.user_id}
+                      onPreview={openPreview}
+                    />
+                  ))}
                 </AnimatePresence>
                 <div ref={scrollRef} />
               </div>
