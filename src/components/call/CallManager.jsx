@@ -1,5 +1,5 @@
 // src/components/call/CallManager.jsx
-import { useEffect, useRef, useState, memo, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCall } from "../../contexts/CallContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -8,43 +8,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "../common/Button";
 import Image from "../common/Image";
 import {
-  faPhone,
-  faVideo,
-  faPhoneSlash,
-  faMicrophone,
   faMicrophoneSlash,
-  faVideoSlash,
-  faDisplay,
   faRotateRight,
   faWindowMaximize,
   faWindowMinimize,
 } from "@fortawesome/free-solid-svg-icons";
+import RemoteAudioStream from "../common/RemoteAudioStream";
+import { formatSecondsToTime } from "../../utils/formatters";
+import IncomingCallModal from "./IncomingCallModal";
+import CallControlsBar from "./CallControlsBar";
 
-// Persistent Remote Audio Stream: matches MeetingRoom.jsx exactly
-const RemoteAudioStream = memo(({ stream, streamVersion, isAudioMuted }) => {
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    if (audioRef.current && stream) {
-      if (audioRef.current.srcObject !== stream) {
-        audioRef.current.srcObject = stream;
-      }
-      audioRef.current.play().catch((e) => {
-        console.warn("[CallManager] Audio play error:", e);
-      });
-    }
-  }, [stream, streamVersion]);
-
-  return (
-    <audio
-      ref={audioRef}
-      autoPlay
-      muted={Boolean(isAudioMuted)}
-      className="hidden"
-    />
-  );
-});
-RemoteAudioStream.displayName = "RemoteAudioStream";
 
 const CallManager = () => {
   const { user } = useAuth();
@@ -102,11 +75,8 @@ const CallManager = () => {
     return () => clearInterval(interval);
   }, [callStatus]);
 
-  const formatTimer = (totalSeconds) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
+  const formatTimer = (totalSeconds) => formatSecondsToTime(totalSeconds);
+
 
   // Bind remote video stream directly (muted={true} avoids browser autoplay block)
   useEffect(() => {
@@ -220,60 +190,16 @@ const CallManager = () => {
           </motion.div>
         )}
 
-        {/* Incoming Call Notification: Non-invasive FLOATING widget in bottom-right corner */}
+        {/* Incoming Call Notification */}
         {callStatus === "receiving" && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.85, y: 30 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-6 right-6 z-10005 pointer-events-auto"
-          >
-            <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-5 w-84 text-white flex flex-col items-center">
-              <div className="relative mb-3">
-                <Image
-                  src={api.getFileUrl(callerInfo?.avatar, callerInfo?.name)}
-                  alt={callerInfo?.name || "Usuario"}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-white/30 shadow-lg"
-                />
-                <span className="absolute -bottom-1 -right-1 bg-green-500 text-white rounded-full p-1.5 shadow-md flex items-center justify-center animate-bounce">
-                  <FontAwesomeIcon
-                    icon={callType === "video" ? faVideo : faPhone}
-                    className="text-xs"
-                  />
-                </span>
-              </div>
-
-              <h4 className="text-base font-bold truncate max-w-full text-center">
-                {callerInfo?.name || "Usuario"}
-              </h4>
-              <p className="text-xs text-white/60 mb-4 text-center">
-                {callType === "video"
-                  ? "Videollamada entrante..."
-                  : "Llamada de voz entrante..."}
-              </p>
-
-              <div className="flex gap-3 w-full">
-                <Button
-                  variant="none"
-                  icon={faPhone}
-                  onClick={acceptCall}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
-                >
-                  Aceptar
-                </Button>
-                <Button
-                  variant="none"
-                  icon={faPhoneSlash}
-                  onClick={rejectCall}
-                  className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
-                >
-                  Rechazar
-                </Button>
-              </div>
-            </div>
-          </motion.div>
+          <IncomingCallModal
+            callerInfo={callerInfo}
+            callType={callType}
+            acceptCall={acceptCall}
+            rejectCall={rejectCall}
+          />
         )}
+
 
         {/* Active & Calling Screen: Unified single-mounted container that toggles between full stage and floating PiP */}
         {(callStatus === "active" || callStatus === "calling") && (
@@ -539,97 +465,19 @@ const CallManager = () => {
             </main>
 
             {/* Bottom Controls Bar */}
-            <footer
-              className={`${
-                isMinimized
-                  ? "p-2 bg-gray-900/95 border-t border-white/10"
-                  : "p-4 sm:p-6"
-              } flex justify-center items-center shrink-0 z-20`}
-            >
-              <div
-                className={`${
-                  isMinimized
-                    ? "flex items-center gap-3"
-                    : "bg-gray-900/95 backdrop-blur-xl border border-white/15 px-6 sm:px-8 py-3 rounded-full shadow-2xl flex items-center gap-3 sm:gap-5"
-                }`}
-              >
-                {/* Microphone Toggle */}
-                <button
-                  type="button"
-                  onClick={toggleMute}
-                  className={`${
-                    isMinimized
-                      ? "w-9 h-9 text-xs"
-                      : "w-12 h-12 sm:w-14 sm:h-14 text-base sm:text-lg"
-                  } rounded-full flex items-center justify-center transition-all active:scale-95 ${
-                    isMuted
-                      ? "bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30"
-                      : "bg-white/10 hover:bg-white/20 text-white"
-                  }`}
-                  title={isMuted ? "Activar micrófono" : "Silenciar micrófono"}
-                >
-                  <FontAwesomeIcon
-                    icon={isMuted ? faMicrophoneSlash : faMicrophone}
-                  />
-                </button>
+            <CallControlsBar
+              isMinimized={isMinimized}
+              toggleMute={toggleMute}
+              isMuted={isMuted}
+              callType={callType}
+              toggleVideo={toggleVideo}
+              isCamOff={isCamOff}
+              callStatus={callStatus}
+              handleToggleScreenShare={handleToggleScreenShare}
+              isScreenSharing={isScreenSharing}
+              endCall={endCall}
+            />
 
-                {/* Camera Toggle (Video Calls only) */}
-                {callType === "video" && (
-                  <button
-                    type="button"
-                    onClick={toggleVideo}
-                    className={`${
-                      isMinimized
-                        ? "w-9 h-9 text-xs"
-                        : "w-12 h-12 sm:w-14 sm:h-14 text-base sm:text-lg"
-                    } rounded-full flex items-center justify-center transition-all active:scale-95 ${
-                      isCamOff
-                        ? "bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30"
-                        : "bg-white/10 hover:bg-white/20 text-white"
-                    }`}
-                    title={isCamOff ? "Activar cámara" : "Apagar cámara"}
-                  >
-                    <FontAwesomeIcon
-                      icon={isCamOff ? faVideoSlash : faVideo}
-                    />
-                  </button>
-                )}
-
-                {/* Screen Sharing Toggle (Active Video Calls only, hidden when minimized) */}
-                {callType === "video" && callStatus === "active" && !isMinimized && (
-                  <button
-                    type="button"
-                    onClick={handleToggleScreenShare}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-base sm:text-lg transition-all active:scale-95 bg-white/10 hover:bg-white/20 text-white"
-                    title={
-                      isScreenSharing
-                        ? "Detener compartir pantalla"
-                        : "Compartir tu pantalla"
-                    }
-                  >
-                    <FontAwesomeIcon
-                      icon={faDisplay}
-                      className={isScreenSharing ? "text-blue-400" : "text-white"}
-                    />
-                  </button>
-                )}
-
-                {/* Hang Up Button (Colgar) */}
-                <button
-                  type="button"
-                  onClick={endCall}
-                  className={`${
-                    isMinimized
-                      ? "w-9 h-9 rounded-full text-xs"
-                      : "h-12 sm:h-14 px-6 sm:px-8 rounded-full text-sm sm:text-base gap-2.5"
-                  } bg-red-600 hover:bg-red-700 text-white font-bold flex items-center justify-center shadow-xl shadow-red-600/40 active:scale-95 transition-all`}
-                  title="Finalizar la llamada"
-                >
-                  <FontAwesomeIcon icon={faPhoneSlash} />
-                  {!isMinimized && <span className="hidden sm:inline">Colgar</span>}
-                </button>
-              </div>
-            </footer>
           </motion.div>
         )}
       </AnimatePresence>

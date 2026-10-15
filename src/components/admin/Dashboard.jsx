@@ -17,6 +17,7 @@ import { useDashboard } from "../../hooks/useDashboard";
 import Header from "../layout/Header";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
+import Pagination from "../common/Pagination";
 
 const StatusManager = lazy(() => import("../dashboard/StatusManager"));
 const MyAttendance = lazy(() => import("../dashboard/MyAttendance"));
@@ -29,7 +30,6 @@ const NotificationsPanel = lazy(() => import("./NotificationsPanel"));
 const ReportsPanel = lazy(() => import("./ReportsPanel"));
 const EventsPanel = lazy(() => import("../events/EventsPanel"));
 const FilterBar = lazy(() => import("./FilterBar"));
-const Pagination = lazy(() => import("../common/Pagination"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-12 text-vgsgray animate-pulse">

@@ -143,8 +143,6 @@ export const EventsProvider = ({ children }) => {
   useEffect(() => {
     if (!socket || !user?.user_id) return;
 
-    console.log("[EventsContext] Subscribing to event socket channels");
-
     const handleAttendancePrompt = (data) => {
       console.log("[EventsContext] Received event_attendance_prompt:", data);
       const eventId = data?.event_id ?? data?.id;

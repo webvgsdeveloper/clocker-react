@@ -45,147 +45,16 @@ import {
   staggerContainer,
 } from "../common/animations";
 
-const RELEVANT_STATUSES = [
-  "break",
-  "lunch",
-  "brb",
-  "rec",
-  "coaching",
-  "team_meeting",
-];
+import {
+  RELEVANT_STATUSES,
+  STATUS_TO_TREMOR_COLOR,
+  formatAxisValue,
+} from "../reports/analyticsConfig";
+import ChartTooltip from "../reports/AnalyticsTooltip";
+import KPICards from "../reports/KPICards";
+import ScrollableChartContainer from "../reports/ScrollableChartContainer";
+import StatusLegend from "../reports/StatusLegend";
 
-const STATUS_TO_TREMOR_COLOR = {
-  break: "yellow",
-  lunch: "orange",
-  brb: "purple",
-  rec: "red",
-  coaching: "indigo",
-  team_meeting: "cyan",
-  online: "green",
-};
-
-const formatAxisValue = (value, isPayroll = false) => {
-  if (value === 0) return "";
-  if (isPayroll) return `${value.toFixed(0)}h`;
-  if (value >= 60) {
-    const hours = Math.floor(value / 60);
-    const mins = Math.round(value % 60);
-    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-  }
-  return `${Math.round(value)}m`;
-};
-
-// Tooltip
-const ChartTooltip = ({ payload, active, label, isPayroll = false }) => {
-  if (!active || !payload?.length) return null;
-  const data = payload[0].payload;
-
-  return (
-    <motion.div
-      variants={tooltipVariants}
-      initial="hidden"
-      animate="visible"
-      className="flex flex-col gap-y-1 w-52 p-3 rounded-md border border-vgsgray border-dashed bg-vgswhite shadow-lg z-50"
-    >
-      <div className="border-b border-vgsgray/20 pb-1 mb-1">
-        <p className="text-[10px] font-bold text-vgsblack uppercase tracking-tight">
-          {label}
-        </p>
-      </div>
-      {payload.map((category, idx) => {
-        if (category.value <= 0) return null;
-
-        const cleanStatus = isPayroll
-          ? "online"
-          : category.dataKey.replace("_usage", "").replace("_overrate", "");
-
-        const count = data[`${cleanStatus}_count`] || 0;
-
-        return (
-          <div
-            key={idx}
-            className="w-full flex gap-x-2 text-xs font-bold items-center"
-          >
-            <span className="text-vgsgray font-mono min-w-3.75">{count}</span>
-            <StatusBadge status={cleanStatus} />
-            <p className="ml-auto text-vgsgray font-mono">
-              {formatDuration(isPayroll ? category.value * 60 : category.value)}
-            </p>
-          </div>
-        );
-      })}
-    </motion.div>
-  );
-};
-
-// KPIs
-const KPICards = ({ data }) => {
-  const totals = useMemo(() => {
-    const hours = data.reduce(
-      (acc, curr) => acc + (curr["Worked Hours"] || 0),
-      0,
-    );
-    const over = data.reduce((acc, curr) => {
-      let dailyOver = 0;
-      RELEVANT_STATUSES.forEach(
-        (st) => (dailyOver += curr[`${st}_overrate`] || 0),
-      );
-      return acc + dailyOver;
-    }, 0);
-    return { hours: hours.toFixed(1), over: Math.round(over) };
-  }, [data]);
-
-  return (
-    <Grid numItemsSm={1} numItemsLg={3} className="gap-4 mb-6">
-      <Card className="border border-vgsgray border-t-4 border-t-green-600">
-        <Flex justifyContent="start" className="gap-4">
-          <StatusBadge status="online" />
-          <div>
-            <Text className="text-green-600 font-bold uppercase text-xs">
-              Total Worked Hours
-            </Text>
-            <Metric className="text-vgsblack">{totals.hours} h</Metric>
-          </div>
-        </Flex>
-      </Card>
-      <Card className="border border-vgsgray border-t-4 border-t-red-500">
-        <Flex justifyContent="start" className="gap-4">
-          <Badge icon={faAlarmClock} variant="red" size="lg" outline="true" />
-          <div>
-            <Text className="text-red-500 font-bold uppercase text-xs">
-              Total Overrate
-            </Text>
-            <Metric className="text-vgsblack">{totals.over} m</Metric>
-          </div>
-        </Flex>
-      </Card>
-      <Card className="border border-vgsgray border-t-4 border-t-teal-500">
-        <Flex justifyContent="start" className="gap-4">
-          <Badge
-            icon={faCheckCircle}
-            variant="none"
-            size="lg"
-            outline="true"
-            className="text-teal-500! border-teal-500!"
-          />
-          <div>
-            <Text className="text-teal-500 font-bold uppercase text-xs">
-              Days Analyzed
-            </Text>
-            <Metric className="text-vgsblack">{data.length}</Metric>
-          </div>
-        </Flex>
-      </Card>
-    </Grid>
-  );
-};
-
-// ScrollableChart
-const ScrollableChartContainer = ({ children, minWidth }) => (
-  <div className="mt-6 overflow-x-auto pb-4 custom-scrollbar">
-    <div style={{ minWidth: `${minWidth}px` }}>{children}</div>
-  </div>
-);
 
 const FilterBar = ({
   dates,
@@ -242,136 +111,8 @@ const FilterBar = ({
   </Card>
 );
 
-const StatusLegend = ({
-  visibleStatuses,
-  hiddenCats,
-  onToggle,
-  appliedFilter,
-  isOverrate = false,
-}) => {
-  const scrollRef = useRef(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-  const [moved, setMoved] = useState(false);
 
-  const filteredList = useMemo(() => {
-    if (!appliedFilter) return visibleStatuses;
-    return visibleStatuses.includes(appliedFilter)
-      ? visibleStatuses.filter((s) => s === appliedFilter)
-      : [appliedFilter];
-  }, [visibleStatuses, appliedFilter]);
 
-  const checkScroll = useCallback(() => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setShowLeftArrow(scrollLeft > 5);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, [checkScroll, filteredList]);
-
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartX(e.pageX - scrollRef.current.offsetLeft);
-    setScrollLeft(scrollRef.current.scrollLeft);
-    setMoved(false);
-  };
-
-  const handleMouseLeave = () => setIsDragging(false);
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setTimeout(() => setMoved(false), 10);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    if (Math.abs(walk) > 5) setMoved(true);
-    scrollRef.current.scrollLeft = scrollLeft - walk;
-    checkScroll();
-  };
-
-  const scrollBy = (dist) => {
-    scrollRef.current.scrollBy({ left: dist, behavior: "smooth" });
-    setTimeout(checkScroll, 300);
-  };
-
-  return (
-    <div className="relative flex items-center flex-1 min-w-0 group">
-      {/* Flecha Izquierda */}
-      <AnimatePresence>
-        {showLeftArrow && (
-          <motion.button
-            initial={{ opacity: 0, x: -5 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -5 }}
-            onClick={() => scrollBy(-150)}
-            className="absolute left-0 z-10 bg-linear-to-r from-vgswhite via-vgswhite to-transparent pr-4 pl-1 text-vgsgray hover:text-vgsblack transition-colors"
-          >
-            <FontAwesomeIcon icon={faChevronLeft} size="xs" />
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      <div
-        ref={scrollRef}
-        onScroll={checkScroll}
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeave}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        className={`flex p-1 gap-2 flex-1 overflow-x-auto no-scrollbar items-center cursor-grab active:cursor-grabbing select-none`}
-      >
-        <AnimatePresence mode="popLayout">
-          {filteredList.map((status) => (
-            <motion.div
-              key={status}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                if (!moved) onToggle(status);
-              }}
-            >
-              <StatusBadge
-                status={status}
-                icon={isOverrate ? faExclamationTriangle : null}
-                className={`transition-opacity ${hiddenCats.has(status) ? "opacity-30" : "opacity-100"}`}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {/* Flecha Derecha */}
-      <AnimatePresence>
-        {showRightArrow && (
-          <motion.button
-            initial={{ opacity: 0, x: 5 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 5 }}
-            onClick={() => scrollBy(150)}
-            className="absolute right-0 z-10 bg-linear-to-l from-vgswhite via-vgswhite to-transparent pl-4 pr-1 text-vgsblack"
-          >
-            <FontAwesomeIcon icon={faChevronRight} size="xs" />
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
 
 const MyAttendance = ({ token }) => {
   const [dates, setDates] = useState(() => {
@@ -661,8 +402,8 @@ const MyAttendance = ({ token }) => {
       <motion.div variants={fadeInUp}>
         <Card className="border border-vgsgray overflow-hidden">
           <div className="flex items-center gap-2 mb-1">
-            <Title className="text-vgsblack font-bold flex items-center gap-2 mb-1">
-              <StatusBadge status="online" />
+            <StatusBadge status="online" />
+            <Title className="text-vgsblack font-bold">
               Worked Hours (Payroll)
             </Title>
           </div>

@@ -93,8 +93,27 @@ export const useDashboard = (allTabs) => {
       }
 
       if (response?.success) {
-        setUsers(response.users || []);
-        setMeta(response.meta || { total_records: 0, total_pages: 0 });
+        const userList = response.users || response.data || [];
+        setUsers(userList);
+
+        const rawMeta = response.meta || response.pagination || {};
+        const totalRecords =
+          rawMeta.total_records ??
+          rawMeta.totalRecords ??
+          rawMeta.total ??
+          rawMeta.count ??
+          userList.length;
+
+        const totalPages =
+          rawMeta.total_pages ??
+          rawMeta.totalPages ??
+          rawMeta.pages ??
+          (totalRecords > 0 ? Math.ceil(totalRecords / ITEMS_PER_PAGE) : 1);
+
+        setMeta({
+          total_records: Number(totalRecords) || userList.length,
+          total_pages: Number(totalPages) || 1,
+        });
         setLastUpdate(new Date());
       }
     } catch (error) {
@@ -172,11 +191,15 @@ export const useDashboard = (allTabs) => {
     setShowUserForm(true);
   }, []);
 
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
+
+  const addNotificationRef = useRef(addNotification);
+  addNotificationRef.current = addNotification;
+
   // Socket listener for live updates
   useEffect(() => {
     if (!socket || !user?.user_id) return;
-
-    console.log("[useDashboard] Registering live status listeners on socket");
 
     const handleUserStatusChanged = (data) => {
       console.log("[useDashboard] user_status_changed received:", data);
@@ -203,10 +226,10 @@ export const useDashboard = (allTabs) => {
     const handleNewDirectMessage = (msg) => {
       if (
         msg.sender_id !== user.user_id &&
-        activeTab !== "chat" &&
+        activeTabRef.current !== "chat" &&
         Number(msg.sender_id) !== 0
       ) {
-        addNotification(
+        addNotificationRef.current(
           msg.sender_name || "Chat",
           msg.message || "New File",
           "chat",
@@ -228,7 +251,7 @@ export const useDashboard = (allTabs) => {
       socket.off("update_status_live", handleUserStatusChanged);
       socket.off("new_direct_message", handleNewDirectMessage);
     };
-  }, [socket, activeTab, user?.user_id, addNotification]);
+  }, [socket, user?.user_id]);
 
   return {
     user,

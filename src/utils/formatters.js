@@ -33,3 +33,35 @@ export const formatDateTime = (dateString) => {
     hour12: true,
   }).format(date);
 };
+
+export const formatSecondsToTime = (totalSeconds, forceHours = false) => {
+  const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+  const hrs = Math.floor(safeSeconds / 3600);
+  const mins = Math.floor((safeSeconds % 3600) / 60);
+  const secs = safeSeconds % 60;
+
+  if (hrs > 0 || forceHours) {
+    return `${hrs.toString().padStart(2, "0")}:${mins
+      .toString()
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
+  return `${mins.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
+};
+
+export const toInputDateTime = (isoString) => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return "";
+  const tzOffset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+};
+
+export const toIsoDateTime = (localString) => {
+  if (!localString) return null;
+  const date = new Date(localString);
+  if (isNaN(date.getTime())) return null;
+  return date.toISOString();
+};
+

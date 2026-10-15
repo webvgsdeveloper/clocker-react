@@ -1,5 +1,5 @@
 // src/components/AppContent.jsx
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import Badge from "./common/Badge";

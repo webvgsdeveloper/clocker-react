@@ -10,49 +10,8 @@ import {
   faEdit,
   faTrash,
   faExclamationTriangle,
-  faSort,
-  faSortUp,
-  faSortDown,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-// Headers
-const SortableHeader = ({ 
-  label, 
-  column, 
-  currentSort, 
-  onSort,
-  className = ""
-}) => {
-  const isActive = currentSort.sortBy === column;
-  const isAsc = currentSort.sortOrder === "ASC";
-
-  return (
-    <th
-      scope="col"
-      className={`w-100 py-4 bg-vgsred text-vgswhite cursor-pointer group select-none transition-colors hover:bg-vgsred/80 ${className}`}
-      onClick={() => onSort(column)}
-    >
-      <div className="flex justify-center items-center gap-2">
-        <span className="uppercase tracking-wider text-[11px] font-bold group-hover:underline">
-          {label}
-        </span>
-
-        <motion.div
-          animate={{ 
-            opacity: isActive ? 1 : 0.4, 
-            scale: isActive ? 1.1 : 1 
-          }}
-          className="text-[10px]"
-        >
-          <FontAwesomeIcon 
-            icon={!isActive ? faSort : isAsc ? faSortUp : faSortDown}
-          />
-        </motion.div>
-      </div>
-    </th>
-  );
-};
+import SortableHeader from "../common/SortableHeader";
 
 const UserRow = memo(
   forwardRef(({ user, canEdit, canDelete, onDelete, onEdit }, ref) => {

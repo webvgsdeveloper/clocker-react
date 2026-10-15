@@ -141,9 +141,27 @@ const HistoryPanel = ({ token }) => {
         const response = await api.getHistory(token, cleanParams);
 
         if (response.success) {
+          const historyList = response.history || response.data || [];
+          const rawMeta = response.meta || response.pagination || {};
+          const totalRecords =
+            rawMeta.total_records ??
+            rawMeta.totalRecords ??
+            rawMeta.total ??
+            rawMeta.count ??
+            historyList.length;
+
+          const totalPages =
+            rawMeta.total_pages ??
+            rawMeta.totalPages ??
+            rawMeta.pages ??
+            (totalRecords > 0 ? Math.ceil(totalRecords / ITEMS_PER_PAGE) : 1);
+
           const data = {
-            history: response.history || [],
-            meta: response.meta || { total_records: 0, total_pages: 0 },
+            history: historyList,
+            meta: {
+              total_records: Number(totalRecords) || historyList.length,
+              total_pages: Number(totalPages) || 1,
+            },
           };
           setHistory(data.history);
           setMeta(data.meta);
@@ -200,7 +218,7 @@ const HistoryPanel = ({ token }) => {
               <footer className="pt-4">
                 <Pagination
                   currentPage={currentPage}
-                  totalPages={meta.total_pages}
+                  totalPages={meta.total_pages || 1}
                   onPageChange={setCurrentPage}
                   totalRecords={meta.total_records}
                   currentCount={history.length}
