@@ -17,8 +17,10 @@ const Pagination = ({
 }) => {
   const total = Number(totalPages) || 0;
   const current = Number(currentPage) || 1;
+  const effectiveTotalRecords = totalRecords || currentCount;
 
   const getVisiblePages = () => {
+    if (total <= 1) return [1];
     const delta = 2;
     const range = [];
     for (
@@ -35,9 +37,14 @@ const Pagination = ({
     return range;
   };
 
+  if (total === 0 && effectiveTotalRecords === 0) return null;
+
   return (
-    <div className="mt-6 pb-6 w-full flex flex-col items-center">
-      {total > 1 && (
+    <nav
+      aria-label="Pagination"
+      className="mt-6 pb-6 w-full flex flex-col items-center select-none"
+    >
+      {total >= 1 && (
         <div className="flex justify-center items-center space-x-2 mb-2">
           <Button
             variant="gray"
@@ -52,20 +59,27 @@ const Pagination = ({
           {getVisiblePages().map((page, index) => {
             if (page === "...") {
               return (
-                <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
+                <span
+                  key={`ellipsis-${index}`}
+                  className="px-2 text-vgsgray font-medium"
+                  aria-hidden="true"
+                >
                   ...
                 </span>
               );
             }
 
+            const isCurrent = current === page;
             return (
               <Button
                 key={`page-${page}`}
-                variant={current === page ? "blue" : "gray"}
+                variant={isCurrent ? "blue" : "gray"}
                 animation="shrink"
                 onClick={() => onPageChange(page)}
+                aria-current={isCurrent ? "page" : undefined}
+                aria-label={`Page ${page}`}
                 className={`min-w-9.5 px-3 py-2 text-xs font-bold ${
-                  current === page ? "shadow-md" : ""
+                  isCurrent ? "shadow-md" : ""
                 }`}
               >
                 {page}
@@ -76,7 +90,7 @@ const Pagination = ({
           <Button
             variant="gray"
             animation="shrink"
-            disabled={current >= total || total === 0}
+            disabled={current >= total || total <= 1}
             onClick={() => onPageChange(current + 1)}
             icon={faChevronRight}
             className="px-3 py-2 text-xs"
@@ -85,12 +99,12 @@ const Pagination = ({
         </div>
       )}
 
-      {showDetails && totalRecords > 0 && (
-        <p className="text-center text-[10px] text-gray-400 italic font-medium uppercase tracking-wider">
-          Showing {currentCount} of {totalRecords} {unit}
+      {showDetails && effectiveTotalRecords > 0 && (
+        <p className="text-center text-[10px] text-vgsgray italic font-medium uppercase tracking-wider">
+          Showing {currentCount} of {effectiveTotalRecords} {unit}
         </p>
       )}
-    </div>
+    </nav>
   );
 };
 

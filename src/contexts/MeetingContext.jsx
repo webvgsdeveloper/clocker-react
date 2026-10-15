@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import { useAuth } from "./AuthContext";
 import { useNotification } from "./NotificationContext";
+import { ICE_SERVERS } from "../config/webrtc";
 import api from "../services/api";
 
 const MeetingContext = createContext();
@@ -22,26 +23,6 @@ export const useMeeting = () => {
   return context;
 };
 
-const ICE_SERVERS = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" },
-    { urls: "stun:stun3.l.google.com:19302" },
-    { urls: "stun:global.stun.twilio.com:3478" },
-    { urls: "stun:stun.cloudflare.com:3478" },
-    {
-      urls: "turn:openrelay.metered.ca:80",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443",
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-  ],
-};
 
 export const MeetingProvider = ({ children }) => {
   const { user, token, socket } = useAuth();
@@ -88,8 +69,6 @@ export const MeetingProvider = ({ children }) => {
 
   // Clean all WebRTC connections and stop tracks
   const cleanupConnections = useCallback(() => {
-    console.log("[MeetingContext] Cleaning up WebRTC connections");
-
     // Close and remove all peer connections
     Object.entries(peerConnections.current).forEach(([socketId, pc]) => {
       try {
@@ -457,19 +436,25 @@ export const MeetingProvider = ({ children }) => {
     }
   }, [isScreenSharing, activeMeeting, socket, stopScreenShare]);
 
+  const initiatePeerConnectionRef = useRef(initiatePeerConnection);
+  initiatePeerConnectionRef.current = initiatePeerConnection;
+
+  const cleanupConnectionsRef = useRef(cleanupConnections);
+  cleanupConnectionsRef.current = cleanupConnections;
+
+  const addNotificationRef = useRef(addNotification);
+  addNotificationRef.current = addNotification;
+
   // Socket.IO signaling event listeners
   useEffect(() => {
     if (!socket || !user) return;
 
-    console.log("[MeetingContext] Registering meeting socket listeners");
-
     // 1. Existing peers list received after joining
     const handleMeetingJoined = async ({ peers }) => {
       if (!isJoinedRef.current || !activeMeetingRef.current) return;
-      console.log("[MeetingContext] meeting_joined received with peers:", peers);
       if (Array.isArray(peers)) {
         for (const peer of peers) {
-          await initiatePeerConnection(peer.socket_id, true, peer);
+          await initiatePeerConnectionRef.current(peer.socket_id, true, peer);
         }
       }
     };
@@ -477,19 +462,17 @@ export const MeetingProvider = ({ children }) => {
     // 2. New peer joined the room
     const handlePeerJoined = async (newPeer) => {
       if (!isJoinedRef.current || !activeMeetingRef.current) return;
-      console.log("[MeetingContext] meeting_peer_joined received:", newPeer);
       if (newPeer?.socket_id) {
-        await initiatePeerConnection(newPeer.socket_id, false, newPeer);
+        await initiatePeerConnectionRef.current(newPeer.socket_id, false, newPeer);
       }
     };
 
     // 3. WebRTC Offer received
     const handleSignalOffer = async ({ from_socket_id, offer, from_user }) => {
       if (!isJoinedRef.current || !activeMeetingRef.current) return;
-      console.log(`[MeetingContext] Offer received from ${from_socket_id}`);
       let pc = peerConnections.current[from_socket_id];
       if (!pc) {
-        pc = await initiatePeerConnection(from_socket_id, false, from_user);
+        pc = await initiatePeerConnectionRef.current(from_socket_id, false, from_user);
       }
       try {
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
@@ -603,10 +586,9 @@ export const MeetingProvider = ({ children }) => {
     // 9. Meeting ended by host
     const handleMeetingEndedByHost = ({ message }) => {
       if (!isJoinedRef.current || !activeMeetingRef.current) return;
-      console.log("[MeetingContext] Meeting ended by host:", message);
-      cleanupConnections();
+      cleanupConnectionsRef.current();
       setActiveMeeting(null);
-      addNotification(
+      addNotificationRef.current(
         "Reunión Finalizada",
         message || "El anfitrión ha finalizado la reunión.",
         "warning",
@@ -635,13 +617,7 @@ export const MeetingProvider = ({ children }) => {
       socket.off("meeting_peer_left", handlePeerLeft);
       socket.off("meeting_ended_by_host", handleMeetingEndedByHost);
     };
-  }, [
-    socket,
-    user,
-    initiatePeerConnection,
-    cleanupConnections,
-    addNotification,
-  ]);
+  }, [socket, user?.user_id]);
 
   // Warn on beforeunload if user is in an active meeting
   useEffect(() => {

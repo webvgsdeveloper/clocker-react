@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useMemo,
 } from "react";
 import Toast from "../components/common/Toast";
 
@@ -27,6 +28,12 @@ export const NotificationProvider = ({ children }) => {
     return () => window.removeEventListener("click", unlock);
   }, []);
 
+  const mutedUserIdsRef = useRef(mutedUserIds);
+  mutedUserIdsRef.current = mutedUserIds;
+
+  const activeToastsRef = useRef(activeToasts);
+  activeToastsRef.current = activeToasts;
+
   const updateMutedUsers = useCallback((ids) => {
     setMutedUserIds(ids);
   }, []);
@@ -48,14 +55,14 @@ export const NotificationProvider = ({ children }) => {
       if (
         type === "chat" &&
         senderId &&
-        mutedUserIds.includes(Number(senderId))
+        mutedUserIdsRef.current.includes(Number(senderId))
       ) {
         return;
       }
 
       const id = customId || Date.now();
       
-      if (type === "loading" && activeToasts.some(t => t.id === id)) {
+      if (type === "loading" && activeToastsRef.current.some(t => t.id === id)) {
         return id;
       }
 
@@ -85,7 +92,7 @@ export const NotificationProvider = ({ children }) => {
       }
       return id;
     },
-    [mutedUserIds, activeToasts],
+    [],
   );
 
   /**
@@ -108,21 +115,31 @@ export const NotificationProvider = ({ children }) => {
     removeToast(loaderId);
   }, [removeToast]);
 
-  const markAllAsRead = () => {
+  const markAllAsRead = useCallback(() => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      notifications,
+      addNotification,
+      showLoading,
+      hideLoading,
+      markAllAsRead,
+      updateMutedUsers,
+    }),
+    [
+      notifications,
+      addNotification,
+      showLoading,
+      hideLoading,
+      markAllAsRead,
+      updateMutedUsers,
+    ],
+  );
 
   return (
-    <NotificationContext.Provider
-      value={{
-        notifications,
-        addNotification,
-        showLoading,
-        hideLoading,
-        markAllAsRead,
-        updateMutedUsers,
-      }}
-    >
+    <NotificationContext.Provider value={value}>
       {children}
       <div className="fixed top-3 right-3 z-9999 pointer-events-none flex flex-col items-end">
         {activeToasts.map((n) => (

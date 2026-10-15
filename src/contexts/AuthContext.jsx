@@ -118,13 +118,17 @@ export const AuthProvider = ({ children }) => {
     [user],
   );
 
+  const lastJoinedUserRef = useRef(null);
+
   const initSocket = useCallback(
     (userId) => {
       if (!userId) return;
 
       if (socket.current && socket.current.connected) {
-        console.log("[AuthContext] Socket already connected, emitting join_private:", userId);
-        socket.current.emit("join_private", userId);
+        if (lastJoinedUserRef.current !== userId) {
+          socket.current.emit("join_private", userId);
+          lastJoinedUserRef.current = userId;
+        }
         return;
       }
       if (socket.current) socket.current.disconnect();
@@ -139,23 +143,23 @@ export const AuthProvider = ({ children }) => {
       setSocketInstance(newSocket);
 
       newSocket.on("connect", () => {
-        console.log("[AuthContext] Socket connected, joining private room:", userId);
         newSocket.emit("join_private", userId);
+        lastJoinedUserRef.current = userId;
       });
 
       if (newSocket.connected) {
         newSocket.emit("join_private", userId);
+        lastJoinedUserRef.current = userId;
       }
 
       if (newSocket.io) {
         newSocket.io.on("reconnect", () => {
-          console.log("[AuthContext] Socket reconnected, re-joining private room:", userId);
           newSocket.emit("join_private", userId);
+          lastJoinedUserRef.current = userId;
         });
       }
 
       newSocket.on("global_notification", (data) => {
-        console.log("Notificación global recibida:", data);
         addNotification(data.title, data.content, data.type || "info", true);
       });
       return () => {

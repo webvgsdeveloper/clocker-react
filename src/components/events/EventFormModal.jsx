@@ -26,23 +26,8 @@ import Image from "../common/Image";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
+import { toInputDateTime, toIsoDateTime } from "../../utils/formatters";
 
-// Helper: Convert ISO date string to datetime-local input value
-const toInputDateTime = (isoString) => {
-  if (!isoString) return "";
-  const date = new Date(isoString);
-  if (isNaN(date.getTime())) return "";
-  const tzOffset = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
-};
-
-// Helper: Convert local datetime input value to ISO string
-const toIsoDateTime = (localString) => {
-  if (!localString) return null;
-  const date = new Date(localString);
-  if (isNaN(date.getTime())) return null;
-  return date.toISOString();
-};
 
 /**
  * Sub-componente: Campos principales del evento

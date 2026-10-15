@@ -2,13 +2,9 @@
 import React, { memo, useState } from "react";
 import {
   faThLarge,
-  faList,
-  faSort,
-  faSortUp,
-  faSortDown
+  faList
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Card from "../common/Card";
 import Button from "../common/Button";
 import StatusBadge from "../common/StatusBadge";
 import Image from "../common/Image";
@@ -16,90 +12,10 @@ import api from "../../services/api";
 import UserTimelineModal from "../dashboard/UserTimelineModal";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  pageVariants,
-  gridItemVariants
-} from "../common/animations";
+import { pageVariants } from "../common/animations";
 
-const SortableHeader = ({
-  label,
-  column,
-  currentSort,
-  onSort,
-  className = ""
-}) => {
-  const isActive = currentSort?.sortBy === column;
-  const isAsc = currentSort?.sortOrder === "ASC";
-
-  return (
-    <th
-      scope="col"
-      className={`py-3 bg-vgsred text-vgswhite cursor-pointer group select-none transition-colors hover:bg-vgsred/80 ${className}`}
-      onClick={() => onSort(column)}
-    >
-      <div className="flex items-center justify-center gap-2">
-        <span className="uppercase tracking-wider text-[11px] font-bold group-hover:underline">
-          {label}
-        </span>
-        <motion.div
-          animate={{
-            opacity: isActive ? 1 : 0.4,
-            scale: isActive ? 1.1 : 1
-          }}
-          className="text-[10px]"
-        >
-          <FontAwesomeIcon
-            icon={!isActive ? faSort : isAsc ? faSortUp : faSortDown}
-          />
-        </motion.div>
-      </div>
-    </th>
-  );
-};
-
-const UserStatusCard = memo(({ user, onClick }) => {
-  const formattedActivity = user.last_update
-    ? new Date(user.last_update).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-    : null;
-
-  return (
-    <motion.li
-      variants={gridItemVariants}
-      onClick={() => onClick(user)}
-      className="cursor-pointer group list-none h-full"
-    >
-      <Card className="transition-all transform hover:-translate-y-1 h-full">
-        <article className="flex flex-col h-full justify-center">
-          <header className="flex justify-between items-start">
-            <div className="flex items-center gap-3 w-full">
-              <Image
-                src={api.getFileUrl(user.profile_picture, user.nombre)}
-                alt={`Avatar de ${user.nombre}`}
-                className="w-12 h-12 rounded-full border-2 border-vgsgray/30 shadow-sm object-cover group-hover:border-vgsred transition-colors"
-              />
-              <div>
-                <p className="font-bold text-vgsblack leading-none text-wrap capitalize group-hover:text-vgsred transition-colors">
-                  {user.nombre}
-                </p>
-                {formattedActivity && (
-                  <p className="text-[10px] text-vgsgray font-medium">
-                    Last activity: <time>{formattedActivity}</time>
-                  </p>
-                )}
-              </div>
-              <StatusBadge status={user.current_status} className="ml-auto" />
-            </div>
-          </header>
-        </article>
-      </Card>
-    </motion.li>
-  );
-});
-
-UserStatusCard.displayName = "UserStatusCard";
+import SortableHeader from "../common/SortableHeader";
+import UserStatusCard from "./UserStatusCard";
 
 const StatusGrid = memo(({ users, lastUpdate, currentPage = 1, sorting, onSort }) => {
   const { token } = useAuth();
