@@ -37,7 +37,7 @@ const MeetingControls = ({
               ? "bg-red-600 hover:bg-red-700 text-white"
               : "bg-gray-800 hover:bg-gray-700 text-white"
           }`}
-          title={isAudioMuted ? "Activar micrófono" : "Silenciar micrófono"}
+          title={isAudioMuted ? "Unmute microphone" : "Mute microphone"}
         />
 
         {/* Camera Toggle */}
@@ -52,7 +52,7 @@ const MeetingControls = ({
               ? "bg-red-600 hover:bg-red-700 text-white"
               : "bg-gray-800 hover:bg-gray-700 text-white"
           }`}
-          title={isVideoOff ? "Encender cámara" : "Apagar cámara"}
+          title={isVideoOff ? "Turn on camera" : "Turn off camera"}
         />
 
         {/* Screen Share */}
@@ -70,8 +70,8 @@ const MeetingControls = ({
             }`}
             title={
               isScreenSharing
-                ? "Dejar de compartir pantalla"
-                : "Compartir pantalla"
+                ? "Stop sharing screen"
+                : "Share screen"
             }
           />
         )}
@@ -86,7 +86,7 @@ const MeetingControls = ({
             onClick={leaveMeeting}
             className="px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg"
           >
-            Salir
+            Leave
           </Button>
 
           {isHost && (
@@ -96,9 +96,9 @@ const MeetingControls = ({
               animation="shrink"
               onClick={endMeetingForAll}
               className="hidden sm:inline-flex px-3 py-2 text-xs text-red-400 hover:text-red-300 font-semibold underline"
-              title="Finalizar reunión para todos los participantes"
+              title="End meeting for all participants"
             >
-              Finalizar para todos
+              End for all
             </Button>
           )}
         </div>
