@@ -1,3 +1,10 @@
+# Compiled output
+/dist
+/dist-ssr
+
+# Dependencies
+/node_modules
+
 # Logs
 logs
 *.log
@@ -7,28 +14,44 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-.env*
+# Environment variables
+.env
+.env.*
 !.env.example
-.htaccess
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# OS files
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-#gemini
+# IDE files
+.vscode/
+.idea/
+
+# AI & Assistant artifacts
+GEMINI.md
 .gemini
 .geminiignore
+.agents/
+AGENTS.md
 
-# Playwright MCP artifacts
+# Testing & Browser Automation
 .playwright-mcp/
+coverage/
+
+# Certificates, Keys & Secrets
+*.pem
+*.key
+*.crt
+
+# Markdown documents (keep only official project README)
+*.md
+!README.md
+
+# Local & Server configurations
+.htaccess
+*.local

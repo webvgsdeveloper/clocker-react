@@ -750,8 +750,6 @@ const EventsPanel = () => {
         activeGroupId={activeGroup?.id}
         activeGroupName={activeGroup?.name}
       />
-
-      {/* Detail Modal */}
       {detailEventId && (
         <EventDetailModal
           token={token}
