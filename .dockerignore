@@ -17,20 +17,38 @@ pnpm-debug.log*
 .git/
 .gitignore
 
-# Env
+# Environment variables (provided at build-time via Docker ARG / Coolify Build Args)
 .env
-.env.local
-.env*.local
+.env.*
+!.env.example
 
-# IDE
+# IDE & OS
 .vscode/
 .idea/
 .DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# AI 
+# Documentation & AI context (not required for Vite compilation)
+*.md
+GEMINI.md
 .gemini/
 .geminiignore
 .agents/
+AGENTS.md
 
-# Playwright
+# Testing & Browser Automation
 .playwright-mcp/
+coverage/
+
+# Certificates, Keys & Secrets
+*.pem
+*.key
+*.crt
+
+# Temporary files
+*.local
