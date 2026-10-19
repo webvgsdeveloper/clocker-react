@@ -116,15 +116,15 @@ const RemoteVideoTile = memo(
             {peer.name || "Participante"}
           </span>
           {peer.is_host && (
-            <span className="bg-yellow-500 text-black font-bold text-[9px] px-1.5 py-0.5 rounded uppercase flex items-center gap-1 shrink-0">
+            <span className="bg-vgsred text-vgswhite font-bold text-[9px] px-1.5 py-0.5 rounded uppercase flex items-center gap-1 shrink-0">
               <FontAwesomeIcon icon={faCrown} /> Host
             </span>
           )}
           {peer.is_audio_muted && (
             <FontAwesomeIcon
               icon={faMicrophoneSlash}
-              className="text-red-400 text-xs shrink-0"
-              title="Micrófono silenciado"
+              className="text-vgsred text-xs shrink-0"
+              title="Mic muted"
             />
           )}
         </div>

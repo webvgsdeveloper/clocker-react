@@ -151,8 +151,6 @@ const NotificationBell = () => {
                 </Button>
               )}
             </div>
-
-            {/* Static Pending Attendance Section */}
             {pendingAttendances && pendingAttendances.length > 0 && (
               <div className="bg-amber-50/80 border-b-2 border-amber-200/80 p-3 space-y-2.5 max-h-56 overflow-y-auto">
                 <div className="flex items-center justify-between">
@@ -192,8 +190,8 @@ const NotificationBell = () => {
                         </div>
                       </div>
 
-                      <p className="text-[11px] font-medium text-gray-700">
-                        ¿Asististe a este evento?
+                      <p className="text-[11px] font-medium text-vgsblack">
+                        Did you attend this event?
                       </p>
 
                       <div className="flex gap-2">
@@ -204,7 +202,7 @@ const NotificationBell = () => {
                           onClick={() => handleConfirmAction(eventId, true)}
                           className="flex-1 py-1 text-xs font-bold"
                         >
-                          {isLoading ? "..." : "Sí, asistí"}
+                          {isLoading ? "..." : "Yes"}
                         </Button>
                         <Button
                           variant="gray"
@@ -213,7 +211,7 @@ const NotificationBell = () => {
                           onClick={() => handleConfirmAction(eventId, false)}
                           className="flex-1 py-1 text-xs font-semibold hover:text-vgsred"
                         >
-                          {isLoading ? "..." : "No asistí"}
+                          {isLoading ? "..." : "No"}
                         </Button>
                       </div>
                     </div>

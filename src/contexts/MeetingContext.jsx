@@ -255,8 +255,8 @@ export const MeetingProvider = ({ children }) => {
       } catch (err) {
         console.error("[MeetingContext] Error accessing local media:", err);
         addNotification(
-          "Error de Dispositivos",
-          "No se pudo acceder a la cámara o micrófono. Verifica los permisos del navegador.",
+          "Device Error",
+          "Could not access camera or microphone. Please check browser permissions.",
           "error",
           true
         );
@@ -275,10 +275,12 @@ export const MeetingProvider = ({ children }) => {
       try {
         // Step 1: Validate meeting code with backend
         const res = await api.getMeetingInfo(token, meetingCode);
-        if (!res || !res.success || !res.data?.event) {
+        const eventData = res?.data?.event || res?.data;
+
+        if (!res?.success || !eventData || (!eventData.id && !eventData.meeting_code)) {
           addNotification(
-            "Sala no disponible",
-            res?.error || "El código de reunión no es válido o ha expirado.",
+            "Room Unavailable",
+            res?.error || "The meeting code is invalid or has expired.",
             "error",
             true
           );
@@ -286,16 +288,21 @@ export const MeetingProvider = ({ children }) => {
           return;
         }
 
-        const { event, is_host: isHost } = res.data;
-        const meetingType = event.meeting_type || "video";
-        const muteOnEntry = event.meeting_settings?.mute_on_entry ?? false;
+        const isHost = Boolean(
+          res.data?.is_host ??
+          res.data?.is_organizer ??
+          eventData.is_organizer ??
+          (eventData.organizer_id && user?.user_id && String(eventData.organizer_id) === String(user.user_id))
+        );
+        const meetingType = eventData.meeting_type || "video";
+        const muteOnEntry = eventData.meeting_settings?.mute_on_entry ?? false;
 
         setActiveMeeting({
-          event,
+          event: eventData,
           isHost,
           meetingCode,
           meetingType,
-          settings: event.meeting_settings || {},
+          settings: eventData.meeting_settings || {},
         });
 
         // Step 2: Start local media
@@ -333,7 +340,7 @@ export const MeetingProvider = ({ children }) => {
     }
     cleanupConnections();
     setActiveMeeting(null);
-    addNotification("Reunión Finalizada", "Has salido de la sala.", "info", true);
+    addNotification("Meeting Ended", "You have left the meeting.", "info", true);
   }, [activeMeeting, socket, cleanupConnections, addNotification]);
 
   // Host terminates meeting for all participants
@@ -346,8 +353,8 @@ export const MeetingProvider = ({ children }) => {
     cleanupConnections();
     setActiveMeeting(null);
     addNotification(
-      "Reunión Finalizada",
-      "Has finalizado la sesión para todos los asistentes.",
+      "Meeting Ended",
+      "You have ended the session for all participants.",
       "info",
       true
     );
@@ -629,8 +636,8 @@ export const MeetingProvider = ({ children }) => {
       cleanupConnectionsRef.current();
       setActiveMeeting(null);
       addNotificationRef.current(
-        "Reunión Finalizada",
-        message || "El anfitrión ha finalizado la reunión.",
+        "Meeting Ended",
+        message || "The host has ended the meeting.",
         "warning",
         true
       );

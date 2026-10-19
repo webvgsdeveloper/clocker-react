@@ -40,7 +40,7 @@ const MeetingParticipantsDrawer = ({
           <div className="flex items-center justify-between pb-4 border-b border-white/10">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
               <FontAwesomeIcon icon={faUsers} className="text-vgsblue" />
-              Participantes ({totalParticipants})
+              Participants ({totalParticipants})
             </h3>
             <Button
               type="button"
@@ -62,11 +62,11 @@ const MeetingParticipantsDrawer = ({
                 />
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-white truncate">
-                    {user?.nombre} (Tú)
+                    {user?.nombre} (You)
                   </p>
                   {activeMeeting?.isHost && (
                     <span className="text-[10px] text-yellow-400 font-semibold">
-                      Anfitrión
+                      Host
                     </span>
                   )}
                 </div>
@@ -80,7 +80,7 @@ const MeetingParticipantsDrawer = ({
                       ? "text-vgsblue font-bold"
                       : "text-gray-400 hover:text-white"
                   }`}
-                  title={pinnedPeerId === "local" ? "Desfijar" : "Fijar en pantalla"}
+                  title={pinnedPeerId === "local" ? "Unpin" : "Pin to screen"}
                 >
                   <FontAwesomeIcon icon={faThumbtack} />
                 </button>
@@ -107,11 +107,11 @@ const MeetingParticipantsDrawer = ({
                   />
                   <div className="min-w-0">
                     <p className="text-xs font-medium text-white truncate">
-                      {peer.name || "Participante"}
+                      {peer.name || "Participant"}
                     </p>
                     {peer.is_host && (
                       <span className="text-[10px] text-yellow-400 font-semibold">
-                        Anfitrión
+                        Host
                       </span>
                     )}
                   </div>
@@ -127,8 +127,8 @@ const MeetingParticipantsDrawer = ({
                     }`}
                     title={
                       pinnedPeerId === peer.socket_id
-                        ? "Desfijar"
-                        : "Fijar en pantalla"
+                        ? "Unpin"
+                        : "Pin to screen"
                     }
                   >
                     <FontAwesomeIcon icon={faThumbtack} />
@@ -148,7 +148,7 @@ const MeetingParticipantsDrawer = ({
           {activeMeeting?.meetingCode && (
             <div className="pt-4 border-t border-white/10 space-y-2">
               <p className="text-xs text-gray-400">
-                Comparte este código para que otros puedan unirse:
+                Share this code so others can join:
               </p>
               <div className="flex items-center justify-between p-2 rounded-lg bg-gray-800 border border-white/10">
                 <span className="font-mono text-sm font-bold text-vgsblue">
@@ -162,7 +162,7 @@ const MeetingParticipantsDrawer = ({
                   onClick={onCopyCode}
                   className="text-xs text-gray-300 hover:text-white"
                 >
-                  {copied ? "Copiado" : "Copiar"}
+                  {copied ? "Copied" : "Copy"}
                 </Button>
               </div>
             </div>

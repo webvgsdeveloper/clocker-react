@@ -145,10 +145,10 @@ const MeetingRoom = () => {
       <div className="fixed inset-0 z-9999 bg-gray-950/95 backdrop-blur-md flex flex-col items-center justify-center text-white p-4">
         <div className="w-14 h-14 rounded-full border-4 border-vgsdarkblue border-t-transparent animate-spin mb-4" />
         <h3 className="text-base font-bold text-white">
-          Conectando a la reunión...
+          Connecting to meeting...
         </h3>
         <p className="text-xs text-gray-400 mt-1">
-          Accediendo a cámara y micrófono
+          Accessing camera and microphone
         </p>
       </div>
     );
@@ -167,7 +167,6 @@ const MeetingRoom = () => {
 
   return (
     <>
-      {/* Persistent Remote Audio Streams - ALWAYS mounted in DOM to prevent audio drops on layout change or minimize */}
       <div className="hidden" aria-hidden="true">
         {peersList.map((peer) => (
           <RemoteAudioStream
@@ -177,24 +176,21 @@ const MeetingRoom = () => {
           />
         ))}
       </div>
-
-      {/* Minimized Picture-in-Picture Floating View */}
       {isMinimized ? (
         <motion.div
           drag
           dragMomentum={false}
           className="fixed bottom-6 right-6 z-10000 w-84 bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col select-none"
         >
-          {/* Minimized Header */}
           <header className="p-3 bg-gray-800/80 flex items-center justify-between border-b border-white/10 cursor-grab active:cursor-grabbing">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-xs font-bold text-white truncate max-w-35">
                 {focusedPeer?.is_sharing
-                  ? `[Pantalla] ${focusedPeer.name}`
+                  ? `[Screen Share] ${focusedPeer.name}`
                   : focusedPeer
                   ? focusedPeer.name
-                  : activeMeeting.event?.title || "Reunión Clocker"}
+                  : activeMeeting.event?.title || "Meeting"}
               </span>
             </div>
             <div className="flex items-center gap-1">
@@ -205,7 +201,7 @@ const MeetingRoom = () => {
                 icon={faExpand}
                 onClick={() => setIsMinimized(false)}
                 className="text-white/80 hover:text-white p-1 text-xs"
-                title="Maximizar"
+                title="Maximize"
               />
               <Button
                 type="button"
@@ -214,12 +210,10 @@ const MeetingRoom = () => {
                 icon={faPhoneSlash}
                 onClick={leaveMeeting}
                 className="text-red-400 hover:text-red-300 p-1 text-xs"
-                title="Salir"
+                title="Leave"
               />
             </div>
           </header>
-
-          {/* Minimized Video / Tile (Displays focused or pinned peer) */}
           <div className="h-48 relative bg-black flex items-center justify-center overflow-hidden">
             {!isLocalFocused && focusedPeer ? (
               <RemoteVideoTile
@@ -240,8 +234,6 @@ const MeetingRoom = () => {
               />
             )}
           </div>
-
-          {/* Minimized Quick Controls */}
           <footer className="p-2.5 bg-gray-950 flex items-center justify-center gap-3">
             <Button
               type="button"
@@ -270,67 +262,47 @@ const MeetingRoom = () => {
               onClick={() => setIsMinimized(false)}
               className="px-2.5 py-1 text-[11px] font-bold"
             >
-              Abrir Sala ({totalParticipants})
+              Open ({totalParticipants})
             </Button>
           </footer>
         </motion.div>
       ) : (
-        /* Full Screen / Expanded Interactive Meeting Room */
         <AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-9999 bg-vgsgray text-white flex flex-col overflow-hidden font-sans"
+            className="fixed inset-0 z-9999 bg-vgsblack flex flex-col overflow-hidden"
           >
-            {/* Top Meeting Header - Stacked with z-50 so dropdown menus are ALWAYS above video tiles */}
-            <header className="h-16 px-4 sm:px-6 bg-vgsred backdrop-blur-md border-b border-white/10 flex items-center justify-between shrink-0 relative z-50">
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full bg-vgswhite animate-pulse shrink-0" />
-                  <h2 className="text-sm sm:text-base font-bold text-white truncate max-w-40 sm:max-w-md">
-                    {activeMeeting.event?.title || "Reunión Grupal"}
+            <header className="h-16 px-4 sm:px-6 bg-vgsdarkblue flex items-center justify-between shrink-0 relative z-50">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0 text-vgswhite">
+                <div className="flex items-center gap-2.5 ">
+                  <span className="w-3 h-3 rounded-full bg-vgsred animate-pulse shrink-0" />
+                  <h2 className="text-sm sm:text-base font-bold truncate max-w-40 sm:max-w-md">
+                    {activeMeeting.event?.title || "Meeting"}
                   </h2>
                 </div>
-
-                <Badge
-                  variant="red"
-                  size="xs"
-                  icon={
-                    activeMeeting.meetingType === "video" ? faVideo : faHeadset
-                  }
-                  className="hidden md:inline-flex uppercase font-bold"
-                >
-                  {activeMeeting.meetingType === "video"
-                    ? "Videollamada"
-                    : "Sala de Audio"}
-                </Badge>
-
-                <span className="text-xs text-vgswhite px-2.5 py-1 rounded-lg">
+                <span className="text-xs px-2.5 py-1 rounded-lg">
                   {formatTimer(callDuration)}
                 </span>
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* Meeting Code Badge & Copy */}
                 <button
                   onClick={handleCopyCode}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-vgsred hover:bg-black/70 transition-colors border border-vgswhite rounded-xl text-xs"
-                  title="Copiar código de reunión"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 transition-colors border border-vgswhite text-vgswhite rounded-xl text-xs"
+                  title="Copy Meeting Code"
                 >
                   <span>{activeMeeting.meetingCode}</span>
                   <FontAwesomeIcon
                     icon={copied ? faCheck : faCopy}
-                    className={copied ? "text-green-400" : "text-vgsgray"}
+                    className={copied ? "text-gvgsred" : ""}
                   />
                 </button>
-
-                {/* Layout Selector Dropdown */}
                 <div className="relative">
                   <Button
-                    type="button"
-                    variant="white"
-                    size="sm"
+                    variant="red"
+                    size="sx"
                     icon={
                       layoutMode === "grid"
                         ? faTableCellsLarge
@@ -339,27 +311,16 @@ const MeetingRoom = () => {
                         : faWindowMaximize
                     }
                     onClick={() => setIsLayoutMenuOpen((prev) => !prev)}
-                    className="px-2.5 py-1.5 text-xs"
-                    title="Cambiar diseño"
-                  >
-                    <span className="hidden lg:inline">
-                      {layoutMode === "grid"
-                        ? "Cuadrícula"
-                        : layoutMode === "sidebar"
-                        ? "Barra lateral"
-                        : "Foco"}
-                    </span>
-                  </Button>
+                    title="Change Layout"
+                  />
 
                   <AnimatePresence>
                     {isLayoutMenuOpen && (
                       <>
-                        {/* Backdrop to close menu */}
                         <div
                           className="fixed inset-0 z-40"
                           onClick={() => setIsLayoutMenuOpen(false)}
                         />
-                        {/* Menu Pop-in Spring animation */}
                         <motion.div
                           initial={{ opacity: 0, scale: 0.9, y: -10 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -369,7 +330,7 @@ const MeetingRoom = () => {
                             stiffness: 350,
                             damping: 25,
                           }}
-                          className="absolute right-0 mt-2 w-48 bg-vgsblack backdrop-blur-xl border border-vgswhite/20 rounded-2xl shadow-2xl p-2 z-50 space-y-1 ring-1 ring-black/50"
+                          className="absolute right-0 mt-2 w-48 bg-vgswhite rounded-lg z-50"
                         >
                           <button
                             type="button"
@@ -377,17 +338,17 @@ const MeetingRoom = () => {
                               setLayoutMode("grid");
                               setIsLayoutMenuOpen(false);
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                            className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
                               layoutMode === "grid"
-                                ? "bg-vgsdarkblue text-white shadow-sm"
-                                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                                ? "bg-vgsred text-vgswhite"
+                                : "text-vgsblack hover:bg-vgsgray/50"
                             }`}
                           >
                             <FontAwesomeIcon
                               icon={faTableCellsLarge}
                               className="w-4"
                             />
-                            <span>Cuadrícula</span>
+                            <span>Grid</span>
                           </button>
                           <button
                             type="button"
@@ -395,17 +356,17 @@ const MeetingRoom = () => {
                               setLayoutMode("sidebar");
                               setIsLayoutMenuOpen(false);
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                            className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
                               layoutMode === "sidebar"
-                                ? "bg-vgsblue text-white shadow-sm"
-                                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                                ? "bg-vgsred text-vgswhite"
+                                : "text-vgsblack hover:bg-vgsgray/50"
                             }`}
                           >
                             <FontAwesomeIcon
                               icon={faTableColumns}
                               className="w-4"
                             />
-                            <span>Barra lateral</span>
+                            <span>Sidebar</span>
                           </button>
                           <button
                             type="button"
@@ -413,17 +374,17 @@ const MeetingRoom = () => {
                               setLayoutMode("spotlight");
                               setIsLayoutMenuOpen(false);
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                            className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
                               layoutMode === "spotlight"
-                                ? "bg-vgsblue text-white shadow-sm"
-                                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                                ? "bg-vgsblue text-fullwhite"
+                                : "text-vgsblack hover:bg-vgsgray/50"
                             }`}
                           >
                             <FontAwesomeIcon
                               icon={faWindowMaximize}
                               className="w-4"
                             />
-                            <span>Foco principal</span>
+                            <span>Spotlight</span>
                           </button>
                         </motion.div>
                       </>
@@ -431,35 +392,27 @@ const MeetingRoom = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Minimize button */}
                 <Button
                   type="button"
                   variant="white"
-                  size="sm"
+                  size="sx"
                   icon={faCompress}
                   onClick={() => setIsMinimized(true)}
-                  className="p-2 text-sm"
-                  title="Minimizar (Modo Flotante)"
+                  title="Minimize"
                 />
 
-                {/* Participants list toggle */}
                 <Button
-                  type="button"
-                  variant={showParticipants ? "blue" : "white"}
-                  size="sm"
+                  variant="red"
+                  size="sx"
                   icon={faUsers}
+                  title={`${totalParticipants} participants`}
                   onClick={() => setShowParticipants((prev) => !prev)}
-                  className="px-3 py-1.5 text-xs font-semibold gap-1.5"
-                >
-                  <span>{totalParticipants}</span>
-                </Button>
+                />
               </div>
             </header>
 
-            {/* Main Content Area: Smooth Animated Layouts with LayoutGroup */}
             <main className="flex-1 flex overflow-hidden relative">
               <LayoutGroup id="meeting-room-layout">
-                {/* 1. GRID LAYOUT */}
                 {layoutMode === "grid" && (
                   <motion.div
                     key="grid-layout-view"

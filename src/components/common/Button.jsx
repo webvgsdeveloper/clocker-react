@@ -6,9 +6,11 @@ const Button = ({
   children,
   onClick,
   variant = "blue",
+  size = "md",
   disabled,
   className = "",
   tittle = "",
+  title,
   type = "button",
   icon = null,
   iconPosition = "left",
@@ -18,7 +20,13 @@ const Button = ({
   ...props
 }) => {
   const baseStyles =
-    "inline-flex items-center justify-center cursor-pointer px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none gap-2";
+    "inline-flex items-center justify-center cursor-pointer rounded-md font-bold transition-all duration-200 focus:outline-none gap-2";
+
+  const sizes = {
+    xs: "px-2.5 py-1 text-xs",
+    md: "px-4 py-2 text-sm",
+    lg: "px-6 py-3 text-base",
+  };
 
   const variants = {
     blue: "bg-vgsdarkblue text-vgswhite focus:ring-vgsdarkblue disabled:bg-vgsdarkblue focus:ring-2 focus:ring-offset-2",
@@ -32,8 +40,8 @@ const Button = ({
     black: "bg-vgsblack text-vgswhite hover:bg-vgsblack/70 focus:ring-vgsblack disabled:bg-vgsblack/50 focus:ring-2 focus:ring-offset-2",
     white: "bg-vgswhite text-vgsdarkblue hover:bg-vgsgray/20 focus:ring-vgsgray/99 disabled:bg-vgsgray/99 focus:ring-2 focus:ring-offset-2",
     red: "bg-vgsred text-vgswhite hover:bg-vgsred/70 focus:ring-vgsred disabled:bg-vgsred/60 focus:ring-2 focus:ring-offset-2",
-    transparent: "bg-transparent text-vgsblack hover:bg-vgsgray/20 disabled:bg-transparent text-sm",
-    active: "bg-vgsdarkblue text-vgswhite text-sm focus:ring-vgsdarkblue focus:ring-2 focus:ring-offset-2",
+    transparent: "bg-transparent text-vgsblack hover:bg-vgsgray/20 disabled:bg-transparent",
+    active: "bg-vgsdarkblue text-vgswhite focus:ring-vgsdarkblue focus:ring-2 focus:ring-offset-2",
   };
 
   const animations = {
@@ -60,13 +68,15 @@ const Button = ({
     variants: entranceAnimation
   } : {};
 
+  const selectedSize = sizes[size] || sizes.md;
+
   return (
     <motion.button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${baseStyles} ${variants[variant]} ${selectedAnimations} ${className}`}
-      title={tittle}
+      className={`${baseStyles} ${selectedSize} ${variants[variant] || variants.blue} ${selectedAnimations} ${className}`}
+      title={title || tittle}
       {...motionProps}
       {...props}
     >

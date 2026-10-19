@@ -40,6 +40,13 @@ const EmojiPicker = lazy(() => import("emoji-picker-react"));
 // Alias para mantener compatibilidad con nombres anteriores
 const contactListVariants = staggerContainer(0.08);
 
+const formatLastMessage = (msg) => {
+  if (!msg || msg === "No hay mensajes") return "No messages yet";
+  if (msg === "Mensaje cifrado") return "Encrypted message";
+  if (msg === "Archivo/Multimedia") return "Attachment/Media";
+  return msg;
+};
+
 const ContactListItem = memo(({ contact, isSelected, onClick }) => (
   <motion.div
     variants={listItemVariants}
@@ -61,7 +68,9 @@ const ContactListItem = memo(({ contact, isSelected, onClick }) => (
           <Badge icon={faVolumeMute} variant="none" size="sm" />
         )}
       </div>
-      <p className="text-xs text-vgsgray truncate">{contact.last_message}</p>
+      <p className="text-xs text-vgsgray truncate">
+        {formatLastMessage(contact.last_message)}
+      </p>
     </div>
     <div className="flex items-center gap-1">
       <StatusBadge status={contact.user_status} />
@@ -279,7 +288,7 @@ const ChatPanel = ({ token, currentUser, filters }) => {
 
   const handleDeleteChat = async () => {
     if (!selectedContact) return;
-    if (window.confirm("Do you wanna delete this conversation?")) {
+    if (window.confirm("Are you sure you want to delete this conversation?")) {
       const res = await api.deleteChatConversation(token, selectedContact.id);
       if (res.success) {
         setSelectedContact(null);
@@ -382,14 +391,22 @@ const ChatPanel = ({ token, currentUser, filters }) => {
               />
               <div className="flex-1 min-w-0 p-4 overflow-y-auto overflow-x-hidden space-y-4 bg-vgsgray-50/30">
                 <AnimatePresence initial={false}>
-                  {messages.map((m) => (
-                    <ChatMessageItem
-                      key={m.id}
-                      message={m}
-                      currentUserId={currentUser?.user_id}
-                      onPreview={openPreview}
-                    />
-                  ))}
+                  {messages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-center py-12">
+                      <p className="text-xs text-vgsgray font-medium">
+                        No messages yet. Send a message to start the conversation!
+                      </p>
+                    </div>
+                  ) : (
+                    messages.map((m) => (
+                      <ChatMessageItem
+                        key={m.id}
+                        message={m}
+                        currentUserId={currentUser?.user_id}
+                        onPreview={openPreview}
+                      />
+                    ))
+                  )}
                 </AnimatePresence>
                 <div ref={scrollRef} />
               </div>

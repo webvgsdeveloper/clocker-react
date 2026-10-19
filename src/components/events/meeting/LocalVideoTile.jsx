@@ -103,41 +103,41 @@ const LocalVideoTile = memo(
             }}
             className={`absolute top-2.5 left-2.5 p-1.5 sm:p-2 rounded-xl text-xs transition-all duration-200 z-10 ${
               isPinned
-                ? "bg-vgsblue text-white shadow-md opacity-100 ring-2 ring-white/20"
-                : "bg-black/60 text-white/80 hover:text-white hover:bg-black/90 opacity-0 group-hover:opacity-100"
+                ? "bg-vgsblue text-vgswhite opacity-100 ring-2 ring-white/20"
+                : "bg-vgsblack/60 text-vgswhite hover:text-vgswhite hover:bg-vgsblack opacity-0 group-hover:opacity-100"
             }`}
             title={
               isPinned
-                ? "Desfijar de la pantalla principal"
-                : "Fijar en pantalla principal"
+                ? "Unpin from the home screen"
+                : "Pin to home screen"
             }
           >
             <FontAwesomeIcon
               icon={faThumbtack}
-              className={isPinned ? "rotate-45 text-white" : ""}
+              className={isPinned ? "rotate-45 text-vgswhite" : ""}
             />
           </button>
         )}
 
         <div className="absolute bottom-2.5 left-2.5 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-xl text-xs text-white max-w-[85%]">
-          <span className="font-semibold text-vgswhite">Tú</span>
+          <span className="font-semibold text-vgswhite">You</span>
           {isHost && (
-            <span className="bg-yellow-500 text-black font-bold text-[9px] px-1.5 py-0.5 rounded uppercase flex items-center gap-1 shrink-0">
+            <span className="bg-vgsred text-vgswhite font-bold text-[9px] px-1.5 py-0.5 rounded uppercase flex items-center gap-1 shrink-0">
               <FontAwesomeIcon icon={faCrown} /> Host
             </span>
           )}
           {isAudioMuted && (
             <FontAwesomeIcon
               icon={faMicrophoneSlash}
-              className="text-red-400 text-xs shrink-0"
-              title="Tu micrófono está silenciado"
+              className="text-vgsred text-xs shrink-0"
+              title="Mic muted"
             />
           )}
         </div>
 
         {isScreenSharing && (
-          <div className="absolute top-2.5 right-2.5 bg-blue-600 text-white text-[10px] px-2 py-1 rounded-lg flex items-center gap-1.5 font-bold shadow-md z-10">
-            <FontAwesomeIcon icon={faDisplay} /> Tu Pantalla
+          <div className="absolute top-2.5 right-2.5 bg-vgsdarkblue text-vgswhite text-[10px] px-2 py-1 rounded-lg flex items-center gap-1.5 font-bold z-10">
+            <FontAwesomeIcon icon={faDisplay} /> Your Screen
           </div>
         )}
       </motion.div>

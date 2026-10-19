@@ -29,11 +29,11 @@ const AttendancePromptModal = () => {
   if (!isPromptOpen || !activePromptEvent) return null;
 
   const eventId = activePromptEvent.event_id || activePromptEvent.id;
-  const title = activePromptEvent.title || "Evento Finalizado";
+  const title = activePromptEvent.title || "Finished Event";
   const typeName =
     activePromptEvent.event_type ||
     activePromptEvent.event_type_name ||
-    "Actividad";
+    "Activity";
   const startTime = activePromptEvent.start_time;
   const endTime = activePromptEvent.end_time;
   const description = activePromptEvent.description;
@@ -67,12 +67,12 @@ const AttendancePromptModal = () => {
           initial="hidden"
           animate="visible"
           exit="exit"
-          className="relative bg-vgswhite rounded-2xl shadow-2xl border border-vgsgray/30 w-full max-w-md overflow-hidden z-10"
+          className="relative bg-vgswhite rounded-2xl shadow-[0_12px_40px_rgb(12,34,75,0.1)] border border-vgsgray/20 w-full max-w-md overflow-hidden z-10"
           role="dialog"
           aria-modal="true"
         >
           {/* Top colored accent bar */}
-          <div className="h-2 bg-gradient-to-r from-vgsred via-vgsdarkblue to-green-500" />
+          <div className="h-2 bg-linear-to-r from-vgsred via-vgsdarkblue to-green-500" />
 
           <div className="p-6">
             <header className="flex items-start justify-between gap-4 mb-4">
@@ -85,7 +85,7 @@ const AttendancePromptModal = () => {
                     {typeName}
                   </Badge>
                   <h3 className="text-lg font-bold text-vgsblack leading-snug">
-                    Confirmar Asistencia
+                    Confirm Attendance
                   </h3>
                 </div>
               </div>
@@ -95,11 +95,11 @@ const AttendancePromptModal = () => {
                 icon={faXmark}
                 onClick={closePrompt}
                 className="text-vgsgray hover:text-vgsblack p-1 text-base"
-                title="Decidir después"
+                title="Decide later"
               />
             </header>
 
-            <div className="bg-gray-50 rounded-xl p-4 border border-vgsgray/20 mb-5 space-y-2">
+            <div className="bg-vgsgray/5 rounded-xl p-4 border border-vgsgray/15 mb-5 space-y-2">
               <h4 className="font-bold text-vgsdarkblue text-base">{title}</h4>
               {description && (
                 <p className="text-xs text-vgsgray leading-relaxed">
@@ -118,38 +118,38 @@ const AttendancePromptModal = () => {
             </div>
 
             <p className="text-sm font-semibold text-center text-vgsblack mb-5">
-              ¿Asististe a este evento?
+              Did you attend this event?
             </p>
 
             <div className="grid grid-cols-2 gap-3">
               <Button
                 type="button"
                 variant="green"
+                size="md"
                 icon={faCheck}
                 animation="grow"
-                className="py-3 text-sm font-bold shadow-md"
                 disabled={submitting}
                 onClick={() => handleChoice(true)}
               >
-                {submitting ? "Guardando..." : "Sí, asistí"}
+                {submitting ? "Saving..." : "Yes, I attended"}
               </Button>
 
               <Button
                 type="button"
                 variant="gray"
+                size="md"
                 icon={faXmark}
                 animation="shrink"
-                className="py-3 text-sm font-semibold hover:text-vgsred"
+                className="hover:text-vgsred"
                 disabled={submitting}
                 onClick={() => handleChoice(false)}
               >
-                {submitting ? "Guardando..." : "No asistí"}
+                {submitting ? "Saving..." : "I did not attend"}
               </Button>
             </div>
 
             <p className="text-[11px] text-vgsgray text-center mt-4">
-              Si cierras este aviso, podrás responder más tarde desde el panel
-              de notificaciones.
+              If you close this prompt, you can respond later from the notifications panel.
             </p>
           </div>
         </motion.div>

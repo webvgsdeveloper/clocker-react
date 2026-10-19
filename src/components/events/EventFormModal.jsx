@@ -36,31 +36,31 @@ const EventFormFields = memo(
   ({ formData, onFieldChange, types, loadingTypes }) => {
     return (
       <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Título */}
+        {/* Title */}
         <div className="md:col-span-2">
           <Input
             required
             type="text"
-            label="Título del Evento"
+            label="Event Title"
             icon={faCalendarPlus}
             value={formData.title}
             onChange={(e) => onFieldChange("title", e.target.value)}
-            placeholder="Ej: Pausa Activa de Estiramiento / Capacitación de Equipo"
+            placeholder="E.g.: Active Stretching Break / Team Training"
           />
         </div>
 
-        {/* Tipo de Evento */}
+        {/* Event Type */}
         <div className="space-y-1 md:col-span-2">
           <Input
             type="select"
-            label="Tipo de Evento *"
+            label="Event Type *"
             icon={faTag}
             value={formData.event_type_id}
             onChange={(e) => onFieldChange("event_type_id", e.target.value)}
             disabled={loadingTypes}
           >
             {loadingTypes ? (
-              <option value="">Cargando tipos de eventos...</option>
+              <option value="">Loading event types...</option>
             ) : (
               types.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -71,30 +71,30 @@ const EventFormFields = memo(
           </Input>
         </div>
 
-        {/* Fecha y Hora Inicio */}
+        {/* Start Date & Time */}
         <Input
           required
           type="datetime-local"
-          label="Fecha y Hora de Inicio"
+          label="Start Date and Time"
           icon={faCalendarDays}
           value={formData.start_time}
           onChange={(e) => onFieldChange("start_time", e.target.value)}
         />
 
-        {/* Fecha y Hora Fin */}
+        {/* End Date & Time */}
         <Input
           required
           type="datetime-local"
-          label="Fecha y Hora de Fin"
+          label="End Date and Time"
           icon={faCalendarDays}
           value={formData.end_time}
           onChange={(e) => onFieldChange("end_time", e.target.value)}
         />
 
-        {/* Descripción */}
+        {/* Description */}
         <div className="space-y-1 md:col-span-2">
           <label className="block mb-1.5 text-sm font-medium text-vgsblack cursor-pointer">
-            Descripción o Instrucciones
+            Description or Instructions
           </label>
           <textarea
             name="description"
@@ -102,7 +102,7 @@ const EventFormFields = memo(
             onChange={(e) => onFieldChange("description", e.target.value)}
             rows={3}
             className="block w-full transition-all duration-200 outline-none focus:ring-2 appearance-none border border-vgsgray/50 bg-vgswhite focus:border-vgsgray focus:ring-vgsgray/20 rounded-lg p-3 text-sm text-vgsblack placeholder-vgsgray resize-none"
-            placeholder="Detalles sobre la sesión, enlace de reunión virtual u objetivos para los asistentes..."
+            placeholder="Session details, virtual meeting link or goals for attendees..."
           />
         </div>
       </fieldset>
@@ -126,6 +126,7 @@ const EventAudienceSelector = memo(
     loadingUsers,
     userSearch,
     onUserSearchChange,
+    totalParticipants,
   }) => {
     const filteredUsers = availableUsers.filter((u) => {
       if (!userSearch.trim()) return true;
@@ -140,16 +141,16 @@ const EventAudienceSelector = memo(
       <section className="border-t pt-4 border-vgsgray">
         <header className="flex items-center gap-2 mb-3">
           <Badge variant="blue" icon={faUsers} size="md">
-            Audiencia y Participantes
+            Audience and Participants
           </Badge>
         </header>
 
         {/* Audience Pill Selector */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           {[
-            { id: "all", label: "Todos", icon: faGlobe },
-            { id: "workgroup", label: "Mi Grupo", icon: faBriefcase },
-            { id: "users", label: "Específicos", icon: faUsers },
+            { id: "all", label: "All", icon: faGlobe },
+            { id: "workgroup", label: "My Group", icon: faBriefcase },
+            { id: "users", label: "Specific", icon: faUsers },
           ].map((opt) => {
             const isSelected = targetType === opt.id;
             return (
@@ -170,12 +171,40 @@ const EventAudienceSelector = memo(
           })}
         </div>
 
+        {targetType === "all" && (
+          <div className="p-3 rounded-xl bg-vgsgray/5 border border-vgsgray/20 text-xs text-vgsgray flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faGlobe} className="text-vgsdarkblue" />
+              <span>Broadcast to all company employees</span>
+            </span>
+            {totalParticipants && (
+              <span className="font-semibold text-vgsblack">
+                {totalParticipants} participants
+              </span>
+            )}
+          </div>
+        )}
+
+        {targetType === "workgroup" && (
+          <div className="p-3 rounded-xl bg-vgsgray/5 border border-vgsgray/20 text-xs text-vgsgray flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faBriefcase} className="text-vgsdarkblue" />
+              <span>Broadcast to all workgroup members</span>
+            </span>
+            {totalParticipants && (
+              <span className="font-semibold text-vgsblack">
+                {totalParticipants} participants
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Specific Users Picker */}
         {targetType === "users" && (
-          <div className="border border-vgsgray/30 rounded-xl p-3.5 bg-gray-50/70 space-y-3">
+          <div className="border border-vgsgray/20 rounded-xl p-3.5 bg-vgsgray/5 space-y-3">
             <div className="flex items-center justify-between">
               <Badge variant="blue" size="xs" icon={faUsers}>
-                Participantes Seleccionados ({inviteeIds.length})
+                Selected Participants ({inviteeIds.length})
               </Badge>
               {inviteeIds.length > 0 && (
                 <Button
@@ -184,7 +213,7 @@ const EventAudienceSelector = memo(
                   onClick={onClearInvitees}
                   className="text-[11px] text-vgsred font-semibold p-0 hover:underline"
                 >
-                  Deseleccionar todos
+                  Deselect all
                 </Button>
               )}
             </div>
@@ -194,18 +223,18 @@ const EventAudienceSelector = memo(
               type="text"
               value={userSearch}
               onChange={(e) => onUserSearchChange(e.target.value)}
-              placeholder="Buscar colaborador por nombre o cédula..."
+              placeholder="Search coworker by name or ID..."
               className="py-1.5 text-xs"
             />
 
             <div className="max-h-40 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
               {loadingUsers ? (
                 <p className="text-xs text-vgsgray py-3 text-center">
-                  Cargando lista de colaboradores...
+                  Loading coworkers list...
                 </p>
               ) : filteredUsers.length === 0 ? (
                 <p className="text-xs text-vgsgray py-3 text-center">
-                  No se encontraron colaboradores
+                  No coworkers found
                 </p>
               ) : (
                 filteredUsers.map((u) => {
@@ -217,7 +246,7 @@ const EventAudienceSelector = memo(
                       className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors text-xs ${
                         isSelected
                           ? "bg-vgsdarkblue/10 border border-vgsdarkblue/30 font-semibold"
-                          : "bg-white hover:bg-gray-100 border border-transparent"
+                          : "bg-vgswhite hover:bg-vgsgray/10 border border-transparent"
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -285,7 +314,7 @@ const EventMeetingConfig = memo(
       <section className="border-t pt-4 border-vgsgray">
         <header className="flex items-center justify-between mb-3">
           <Badge variant="blue" icon={faVideo} size="md">
-            Reunión Virtual / Videollamada
+            Virtual Meeting / Video Call
           </Badge>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
@@ -295,19 +324,18 @@ const EventMeetingConfig = memo(
               className="w-4 h-4 accent-vgsred rounded cursor-pointer"
             />
             <span className="text-xs font-bold text-vgsblack">
-              Habilitar llamada para este evento
+              Enable call for this event
             </span>
           </label>
         </header>
 
         {hasMeeting && (
-          <div className="bg-gray-50/80 border border-vgsgray/30 rounded-xl p-4 space-y-4">
-            {/* Si ya existe código asignado */}
+          <div className="bg-vgsgray/5 border border-vgsgray/20 rounded-xl p-4 space-y-4">
             {meetingCode && (
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-vgsgray/20">
+              <div className="flex items-center justify-between p-3 bg-vgswhite rounded-lg border border-vgsgray/20">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-vgsgray block">
-                    Código de Reunión Asignado
+                    Assigned Meeting Code
                   </span>
                   <span className="font-mono text-sm font-bold text-vgsdarkblue">
                     {meetingCode}
@@ -322,28 +350,28 @@ const EventMeetingConfig = memo(
                   onClick={handleCopy}
                   className="text-xs"
                 >
-                  {copied ? "Copiado" : "Copiar Código"}
+                  {copied ? "Copied" : "Copy Code"}
                 </Button>
               </div>
             )}
 
-            {/* Tipo de Reunión: Video o Audio */}
+            {/* Room Type */}
             <div>
               <label className="block text-xs font-bold text-vgsblack uppercase tracking-wider mb-2">
-                Tipo de Sala
+                Room Type
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   {
                     id: "video",
-                    label: "Videollamada",
-                    desc: "Cámara de video y audio",
+                    label: "Video Call",
+                    desc: "Video camera and audio",
                     icon: faVideo,
                   },
                   {
                     id: "audio",
-                    label: "Sala de Voz",
-                    desc: "Solo audio / micrófono",
+                    label: "Voice Room",
+                    desc: "Audio only / microphone",
                     icon: faHeadset,
                   },
                 ].map((opt) => {
@@ -356,14 +384,14 @@ const EventMeetingConfig = memo(
                       className={`p-3 rounded-xl border text-left transition-all flex items-start gap-3 cursor-pointer ${
                         isSelected
                           ? "bg-vgsdarkblue/5 border-vgsdarkblue shadow-xs"
-                          : "bg-white border-vgsgray/30 hover:border-vgsgray"
+                          : "bg-vgswhite border-vgsgray/20 hover:border-vgsgray/50"
                       }`}
                     >
                       <div
                         className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                           isSelected
                             ? "bg-vgsdarkblue text-white"
-                            : "bg-gray-100 text-vgsgray"
+                            : "bg-vgsgray/15 text-vgsgray"
                         }`}
                       >
                         <FontAwesomeIcon icon={opt.icon} className="text-sm" />
@@ -382,7 +410,7 @@ const EventMeetingConfig = memo(
               </div>
             </div>
 
-            {/* Ajustes de Reunión */}
+            {/* Meeting Settings */}
             <div className="pt-2 border-t border-vgsgray/20 space-y-2">
               <label className="flex items-center gap-2.5 cursor-pointer select-none">
                 <input
@@ -397,7 +425,7 @@ const EventMeetingConfig = memo(
                   className="w-4 h-4 accent-vgsred rounded cursor-pointer"
                 />
                 <span className="text-xs font-medium text-vgsblack">
-                  Permitir a los participantes compartir pantalla
+                  Allow participants to share screen
                 </span>
               </label>
 
@@ -411,7 +439,7 @@ const EventMeetingConfig = memo(
                   className="w-4 h-4 accent-vgsred rounded cursor-pointer"
                 />
                 <span className="text-xs font-medium text-vgsblack">
-                  Silenciar micrófonos automáticamente al ingresar a la sala
+                  Automatically mute microphones upon entry
                 </span>
               </label>
             </div>
@@ -564,7 +592,11 @@ const EventFormModal = ({
         event_type_id: initialData.event_type_id || "",
         target_type: initialData.target_type || "all",
         target_workgroup_id: initialData.target_workgroup_id || currentGroupId || "",
-        invitee_ids: initialData.invitees?.map((i) => i.user_id || i.id || i) || [],
+        invitee_ids:
+          initialData.invitee_ids ||
+          initialData.invitees?.map((i) => i.user_id || i.id || i) ||
+          initialData.participants?.map((p) => p.user_id || p.id || p) ||
+          [],
         start_time: toInputDateTime(initialData.start_time),
         end_time: toInputDateTime(initialData.end_time),
         has_meeting: hasMeetingInitial,
@@ -603,28 +635,53 @@ const EventFormModal = ({
     }
   }, [initialData, currentGroupId, types]);
 
+  useEffect(() => {
+    if (!token || !isOpen || !initialData?.id || initialData.target_type !== "users") return;
+    let isMounted = true;
+    const loadFullEvent = async () => {
+      try {
+        const res = await api.getEventById(token, initialData.id);
+        if (isMounted && res?.success && res.data) {
+          const detail = res.data;
+          const ids =
+            detail.invitee_ids ||
+            detail.invitees?.map((i) => i.user_id || i.id || i) ||
+            detail.participants?.map((p) => p.user_id || p.id || p) ||
+            [];
+          if (ids.length > 0) {
+            setFormData((prev) => ({ ...prev, invitee_ids: ids }));
+          }
+        }
+      } catch (err) {
+        console.error("Error loading full event detail for editing:", err);
+      }
+    };
+    loadFullEvent();
+    return () => { isMounted = false; };
+  }, [token, isOpen, initialData?.id, initialData?.target_type]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
-      addNotification("Validación", "Por favor ingresa un título para el evento", "warning", true);
+      addNotification("Validation", "Please enter an event title", "warning", true);
       return;
     }
     if (!formData.event_type_id) {
-      addNotification("Validación", "Debes seleccionar un tipo de evento", "warning", true);
+      addNotification("Validation", "You must select an event type", "warning", true);
       return;
     }
     if (!formData.start_time || !formData.end_time) {
-      addNotification("Validación", "Debes especificar la fecha y hora de inicio y fin", "warning", true);
+      addNotification("Validation", "You must specify start and end dates and times", "warning", true);
       return;
     }
     const startIso = toIsoDateTime(formData.start_time);
     const endIso = toIsoDateTime(formData.end_time);
     if (new Date(endIso) <= new Date(startIso)) {
-      addNotification("Validación", "La fecha de finalización debe ser posterior a la de inicio", "warning", true);
+      addNotification("Validation", "End date must be after start date", "warning", true);
       return;
     }
     if (formData.target_type === "users" && formData.invitee_ids.length === 0) {
-      addNotification("Validación", "Debes seleccionar al menos un participante", "warning", true);
+      addNotification("Validation", "You must select at least one participant", "warning", true);
       return;
     }
     const payload = {
@@ -656,11 +713,11 @@ const EventFormModal = ({
         res = await api.createEvent(token, payload);
       }
       if (res?.success) {
-        addNotification("Éxito", isEditing ? "Evento actualizado correctamente" : "Evento programado con éxito", "success", true);
+        addNotification("Success", isEditing ? "Event updated successfully" : "Event scheduled successfully", "success", true);
         if (onSuccess) onSuccess(res.data);
         onClose();
       } else {
-        addNotification("Error", res?.error || "No se pudo guardar el evento", "error", true);
+        addNotification("Error", res?.error || "Could not save event", "error", true);
       }
     } catch (err) {
       console.error("Error saving event:", err);
@@ -680,7 +737,7 @@ const EventFormModal = ({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
         >
-          {/* Backdrop con blur */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -689,7 +746,6 @@ const EventFormModal = ({
             onClick={onClose}
           />
 
-          {/* Draggable Pop-up (idéntico al estilo UserForm) */}
           <motion.div
             drag
             dragMomentum={false}
@@ -699,9 +755,9 @@ const EventFormModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className={`
-              relative bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden 
-              pointer-events-auto border-t-4 ${
-                isEditing ? "border-vgsdarkblue" : "border-vgsred"
+              relative bg-vgswhite rounded-xl shadow-[0_12px_40px_rgb(12,34,75,0.1)] w-full max-w-2xl overflow-hidden 
+              pointer-events-auto border-t-4 border border-vgsgray/20 ${
+                isEditing ? "border-t-vgsdarkblue" : "border-t-vgsred"
               }
               select-none flex flex-col max-h-[90vh]
             `}
@@ -720,7 +776,7 @@ const EventFormModal = ({
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-lg font-bold text-vgsblack leading-none truncate">
-                  {isEditing ? "Editar Evento" : "Programar Evento"}
+                  {isEditing ? "Edit Event" : "Schedule Event"}
                 </h3>
                 <p className="text-[10px] text-vgsgray uppercase font-bold tracking-widest mt-1 truncate">
                   Workspace: {currentGroupName || "General"}
@@ -733,7 +789,7 @@ const EventFormModal = ({
                 icon={faXmark}
                 onClick={onClose}
                 className="text-vgsgray hover:text-vgsblack p-2 text-base"
-                title="Cerrar"
+                title="Close"
               />
             </header>
 
@@ -759,6 +815,7 @@ const EventFormModal = ({
                   loadingUsers={loadingUsers}
                   userSearch={userSearch}
                   onUserSearchChange={setUserSearch}
+                  totalParticipants={initialData?.total_participants || initialData?.total_invited}
                 />
 
                 <EventMeetingConfig
@@ -771,12 +828,12 @@ const EventFormModal = ({
                   meetingCode={formData.meeting_code}
                 />
               </main>
-              <footer className="p-6 bg-gray-50 border-t flex flex-row-reverse gap-3">
+              <footer className="p-6 bg-vgsgray/5 border-t border-vgsgray/20 flex flex-row-reverse gap-3">
                 <Button type="submit" variant={isEditing ? "blue" : "red"} animation="shrink" icon={isEditing ? faArrowsRotate : faCalendarPlus} iconClassName={loading ? "animate-spin" : ""} className="px-8" disabled={loading}>
-                  {loading ? "Guardando..." : isEditing ? "Actualizar Evento" : "Crear Evento"}
+                  {loading ? "Saving..." : isEditing ? "Update Event" : "Create Event"}
                 </Button>
                 <Button type="button" variant="gray" animation="shrink" onClick={onClose} icon={faAngleLeft} className="px-6" disabled={loading}>
-                  Cancelar
+                  Cancel
                 </Button>
               </footer>
             </form>

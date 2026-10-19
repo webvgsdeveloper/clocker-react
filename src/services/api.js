@@ -40,7 +40,12 @@ class ApiService {
         throw new Error("Sesión expirada");
       }
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error en el servidor");
+      if (!response.ok) {
+        const errorMsg = Array.isArray(data.message)
+          ? data.message.join(", ")
+          : (data.message || data.error || "Error en el servidor");
+        throw new Error(errorMsg);
+      }
       return data;
     } catch (error) {
       return { success: false, error: error.message };
@@ -64,7 +69,12 @@ class ApiService {
         throw new Error("Sesión expirada");
       }
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error en el servidor");
+      if (!response.ok) {
+        const errorMsg = Array.isArray(data.message)
+          ? data.message.join(", ")
+          : (data.message || data.error || "Error en el servidor");
+        throw new Error(errorMsg);
+      }
       return data;
     } catch (error) {
       return { success: false, error: error.message };
@@ -91,7 +101,12 @@ class ApiService {
         throw new Error("Sesión expirada");
       }
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error en el servidor");
+      if (!response.ok) {
+        const errorMsg = Array.isArray(data.message)
+          ? data.message.join(", ")
+          : (data.message || data.error || "Error en el servidor");
+        throw new Error(errorMsg);
+      }
       return data;
     } catch (error) {
       return { success: false, error: error.message };
@@ -115,7 +130,12 @@ class ApiService {
         throw new Error("Sesión expirada");
       }
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error en el servidor");
+      if (!response.ok) {
+        const errorMsg = Array.isArray(data.message)
+          ? data.message.join(", ")
+          : (data.message || data.error || "Error en el servidor");
+        throw new Error(errorMsg);
+      }
       return data;
     } catch (error) {
       return { success: false, error: error.message };
@@ -355,8 +375,9 @@ class ApiService {
     return this.post(`events/${eventId}/attendance`, { status, attended: Boolean(attended) }, token);
   }
 
-  async bulkConfirmAttendance(token, eventId, attendees) {
-    return this.post(`events/${eventId}/attendance/bulk`, { attendees }, token);
+  async bulkConfirmAttendance(token, eventId, attendances) {
+    const payload = Array.isArray(attendances) ? { attendances } : (attendances?.attendances ? attendances : { attendances: attendances?.attendees || [] });
+    return this.post(`events/${eventId}/attendance/bulk`, payload, token);
   }
 
   async getPendingAttendance(token) {

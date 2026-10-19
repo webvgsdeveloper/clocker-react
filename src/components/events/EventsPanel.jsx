@@ -48,10 +48,10 @@ import {
 const containerVariants = staggerContainer(0.08, 0.1);
 
 const STATUS_BADGES = {
-  scheduled: { label: "Programado", variant: "blue" },
-  in_progress: { label: "En Curso", variant: "green" },
-  completed: { label: "Completado", variant: "gray" },
-  cancelled: { label: "Cancelado", variant: "red" },
+  scheduled: { label: "Scheduled", variant: "blue" },
+  in_progress: { label: "In Progress", variant: "green" },
+  completed: { label: "Completed", variant: "gray" },
+  cancelled: { label: "Cancelled", variant: "red" },
 };
 
 const EventsPanel = () => {
@@ -117,7 +117,7 @@ const EventsPanel = () => {
           }));
         }
       } else {
-        addNotification("Error", res?.error || "Error al cargar eventos", "error");
+        addNotification("Error", res?.error || "Error loading events", "error");
       }
     } catch (err) {
       console.error("Error fetching events:", err);
@@ -159,12 +159,12 @@ const EventsPanel = () => {
     try {
       const res = await api.deleteEvent(token, deleteEventTarget.id);
       if (res?.success) {
-        addNotification("Éxito", "Evento eliminado correctamente", "success", true);
+        addNotification("Success", "Event deleted successfully", "success", true);
         setDeleteEventTarget(null);
         triggerRefresh();
         fetchEvents();
       } else {
-        addNotification("Error", res?.error || "No se pudo eliminar el evento", "error", true);
+        addNotification("Error", res?.error || "Could not delete event", "error", true);
       }
     } catch (err) {
       console.error("Error deleting event:", err);
@@ -190,8 +190,8 @@ const EventsPanel = () => {
     const code = joinCodeInput.trim();
     if (!code) {
       addNotification(
-        "Validación",
-        "Por favor ingresa un código de reunión.",
+        "Validation",
+        "Please enter a meeting code.",
         "warning",
         true
       );
@@ -213,7 +213,7 @@ const EventsPanel = () => {
       <AnimatePresence>
         {pendingAttendances.length > 0 && (
           <motion.section variants={slideInRight}>
-            <div className="bg-amber-50 border-l-4 border-amber-500 rounded-xl p-4 shadow-xs">
+            <div className="bg-amber-50/70 border border-amber-300 rounded-xl p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
@@ -221,12 +221,11 @@ const EventsPanel = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-amber-900">
-                    Tienes {pendingAttendances.length} confirmación
-                    {pendingAttendances.length > 1 ? "es" : ""} de asistencia pendiente
+                    You have {pendingAttendances.length} pending attendance confirmation
                     {pendingAttendances.length > 1 ? "s" : ""}
                   </h4>
                   <p className="text-xs text-amber-700">
-                    Por favor confirma si asististe a tus actividades concluidas para mantener tus registros actualizados.
+                    Please confirm whether you attended your completed activities to keep your records up to date.
                   </p>
                 </div>
               </div>
@@ -247,9 +246,8 @@ const EventsPanel = () => {
                         animation="grow"
                         disabled={isLoading}
                         onClick={() => handleQuickAttendance(eId, true)}
-                        className="py-1 px-3 text-xs font-bold shadow-xs"
                       >
-                        Sí, asistí
+                        Yes, I attended
                       </Button>
                       <Button
                         variant="gray"
@@ -258,9 +256,9 @@ const EventsPanel = () => {
                         animation="shrink"
                         disabled={isLoading}
                         onClick={() => handleQuickAttendance(eId, false)}
-                        className="py-1 px-3 text-xs hover:text-vgsred"
+                        className="hover:text-vgsred"
                       >
-                        No asistí
+                        I did not attend
                       </Button>
                     </div>
                   );
@@ -275,7 +273,7 @@ const EventsPanel = () => {
       {/* Control Bar: Header & Actions */}
       <motion.header
         variants={slideInLeft}
-        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-vgswhite p-4 rounded-xl border border-vgsgray/30 shadow-xs"
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-vgswhite p-4 rounded-xl border border-vgsgray/20 shadow-xs"
       >
         <div className="flex items-center gap-3">
           <Badge icon={faCalendarDays} variant="red" size="lg">
@@ -287,13 +285,13 @@ const EventsPanel = () => {
             animation="pop"
             icon={faRotateRight}
             className="text-xs text-vgsgray hover:text-vgsdarkblue p-2"
-            title="Actualizar eventos"
+            title="Refresh events"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-          {/* Animated Pill Selector (matching StatusGrid.jsx style) */}
-          <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200 relative">
+          {/* Animated Pill Selector */}
+          <div className="flex bg-vgsgray/10 p-1 rounded-lg border border-vgsgray/20 relative">
             <Button
               onClick={() => {
                 setScope("all");
@@ -305,7 +303,7 @@ const EventsPanel = () => {
                   ? "text-vgsred"
                   : "text-vgsgray hover:text-vgsblack"
               }`}
-              title="Todos los Eventos"
+              title="All Events"
             >
               {scope === "all" && (
                 <motion.div
@@ -316,7 +314,7 @@ const EventsPanel = () => {
               )}
               <span className="relative z-20 flex items-center gap-1.5">
                 <FontAwesomeIcon icon={faGlobe} />
-                <span>Todos</span>
+                <span>All</span>
               </span>
             </Button>
 
@@ -331,7 +329,7 @@ const EventsPanel = () => {
                   ? "text-vgsred"
                   : "text-vgsgray hover:text-vgsblack"
               }`}
-              title="Mis Eventos"
+              title="My Events"
             >
               {scope === "my_events" && (
                 <motion.div
@@ -342,7 +340,7 @@ const EventsPanel = () => {
               )}
               <span className="relative z-20 flex items-center gap-1.5">
                 <FontAwesomeIcon icon={faUsers} />
-                <span>Mis Eventos</span>
+                <span>My Events</span>
               </span>
             </Button>
           </div>
@@ -354,13 +352,13 @@ const EventsPanel = () => {
               setStatusFilter(e.target.value);
               setPagination((p) => ({ ...p, page: 1 }));
             }}
-            className="px-3 py-2 text-xs bg-white border border-vgsgray/40 rounded-lg outline-none font-medium focus:border-vgsdarkblue cursor-pointer h-9"
+            className="px-3 py-2 text-xs bg-vgswhite text-vgsblack border border-vgsgray/30 rounded-lg outline-none font-medium focus:border-vgsdarkblue focus:ring-1 focus:ring-vgsdarkblue/20 cursor-pointer h-9"
           >
-            <option value="">Todos los Estados</option>
-            <option value="scheduled">Programados</option>
-            <option value="in_progress">En Curso</option>
-            <option value="completed">Completados</option>
-            <option value="cancelled">Cancelados</option>
+            <option value="">All Statuses</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
 
           {/* Search Input using Atomic Input */}
@@ -370,7 +368,7 @@ const EventsPanel = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar evento..."
+              placeholder="Search event..."
               className="py-1 text-xs h-9"
             />
           </div>
@@ -378,28 +376,29 @@ const EventsPanel = () => {
           {/* Join with code button */}
           <Button
             variant="blue"
+            size="md"
             icon={faVideo}
             animation="shrink"
             onClick={() => setIsJoinCodeModalOpen(true)}
-            className="text-xs font-bold py-2 px-3 shadow-xs bg-vgsdarkblue text-white ml-auto lg:ml-0"
-            title="Unirse a una reunión o sala con código"
+            className="ml-auto lg:ml-0"
+            title="Join a meeting or room with code"
           >
-            Unirse con Código
+            Join
           </Button>
 
           {/* Create Button (permission gated) */}
           {userCanCreate && (
             <Button
               variant="red"
+              size="md"
               icon={faCalendarPlus}
               animation="shrink gradient"
               onClick={() => {
                 setEditingEvent(null);
                 setIsFormOpen(true);
               }}
-              className="text-xs font-bold py-2 px-4 shadow-sm"
             >
-              Nuevo Evento
+              New
             </Button>
           )}
         </div>
@@ -410,7 +409,7 @@ const EventsPanel = () => {
         {loading ? (
         <div className="text-center py-20 text-vgsgray">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vgsred mx-auto mb-3" />
-          <p className="text-sm">Cargando actividades y eventos...</p>
+          <p className="text-sm">Loading activities and events...</p>
         </div>
       ) : filteredEvents.length === 0 ? (
         <Card className="text-center py-16">
@@ -419,12 +418,12 @@ const EventsPanel = () => {
             className="text-vgsgray/40 text-5xl mb-3"
           />
           <h4 className="text-base font-bold text-vgsblack mb-1">
-            No se encontraron eventos
+            No events found
           </h4>
           <p className="text-xs text-vgsgray max-w-sm mx-auto mb-5">
             {scope === "my_events"
-              ? "No tienes eventos programados ni participaciones activas."
-              : "No hay actividades registradas con los filtros seleccionados."}
+              ? "You have no scheduled events or active participations."
+              : "No activities registered with the selected filters."}
           </p>
           {userCanCreate && (
             <Button
@@ -436,7 +435,7 @@ const EventsPanel = () => {
                 setIsFormOpen(true);
               }}
             >
-              Programar Primer Evento
+              Schedule First Event
             </Button>
           )}
         </Card>
@@ -449,24 +448,27 @@ const EventsPanel = () => {
         >
           {filteredEvents.map((event) => {
             const statusInfo = STATUS_BADGES[event.status] || {
-              label: event.status || "Programado",
+              label: event.status || "Scheduled",
               variant: "blue",
             };
 
             const canManage =
               isAdmin ||
-              event.is_my_organized_event ||
+              Boolean(event.is_my_organized_event || event.am_i_organizer) ||
               Number(event.organizer_id) === Number(user?.user_id);
 
             const isPendingMyAttendance =
               event.my_attendance_status === "pending" &&
               event.status === "completed";
 
+            const totalInvited = Number(
+              event.total_participants ?? event.total_invited ?? 0
+            );
+            const totalAttended = Number(event.total_attended ?? 0);
+
             const attendancePercent =
-              event.total_invited > 0
-                ? Math.round(
-                    ((event.total_attended || 0) / event.total_invited) * 100
-                  )
+              totalInvited > 0
+                ? Math.round((totalAttended / totalInvited) * 100)
                 : 0;
 
             const isCurrentActionLoading = actionLoadingId === event.id;
@@ -482,12 +484,12 @@ const EventsPanel = () => {
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 className="h-full"
               >
-                <div className="bg-vgswhite rounded-2xl border border-vgsgray/30 shadow-xs hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col h-full">
+                <div className="bg-vgswhite rounded-2xl border border-vgsgray/20 hover:border-vgsdarkblue/30 shadow-xs transition-all duration-200 overflow-hidden flex flex-col h-full">
                   {/* Top Bar: Event Type & Status */}
                   <div className="px-5 pt-4 pb-2 flex justify-between items-center gap-2 border-b border-vgsgray/10">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <Badge variant="blue" size="xs" icon={faTag}>
-                        {event.event_type_name || "Actividad"}
+                        {event.event_type_name || "Activity"}
                       </Badge>
                       {hasMeeting && (
                         <Badge
@@ -499,7 +501,7 @@ const EventsPanel = () => {
                             event.meeting_type === "audio" ? faHeadset : faVideo
                           }
                         >
-                          {event.meeting_type === "audio" ? "Voz" : "Meet"}
+                          {event.meeting_type === "audio" ? "Voice" : "Meet"}
                         </Badge>
                       )}
                     </div>
@@ -542,14 +544,15 @@ const EventsPanel = () => {
                             {event.organizer_name}
                           </span>
                         </div>
-                        {event.is_my_organized_event && (
+                        {Boolean(event.is_my_organized_event || event.am_i_organizer) && (
                           <Badge
-                            variant="yellow"
+                            variant="blue"
+                            outline
                             size="xs"
                             icon={faCrown}
                             className="text-[10px] font-bold"
                           >
-                            Organizador
+                            Organizer
                           </Badge>
                         )}
                       </div>
@@ -568,13 +571,13 @@ const EventsPanel = () => {
                             className="text-vgsdarkblue"
                           />
                           {event.target_type === "all"
-                            ? "Público General"
+                            ? "General Public"
                             : event.target_type === "workgroup"
-                            ? "Grupo de Trabajo"
-                            : "Usuarios Seleccionados"}
+                            ? "Workgroup"
+                            : "Selected Users"}
                         </span>
                         <span className="font-semibold text-vgsblack">
-                          {event.total_invited || 0} invitados
+                          {totalInvited} invited
                         </span>
                       </div>
 
@@ -588,18 +591,17 @@ const EventsPanel = () => {
                     </div>
 
                     {/* Attendance Progress & My Status */}
-                    <div className="bg-gray-50/80 rounded-xl p-3 border border-vgsgray/20 space-y-2">
+                    <div className="bg-vgsgray/5 rounded-xl p-3 border border-vgsgray/15 space-y-2">
                       <div className="flex justify-between items-center text-[11px]">
                         <span className="font-bold text-vgsblack">
-                          Asistencias ({event.total_attended || 0}/
-                          {event.total_invited || 0})
+                          Attendance ({totalAttended}/{totalInvited})
                         </span>
                         <span className="font-mono text-vgsdarkblue font-bold">
                           {attendancePercent}%
                         </span>
                       </div>
 
-                      <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                      <div className="w-full bg-vgsgray/20 h-1.5 rounded-full overflow-hidden">
                         <div
                           className="bg-green-500 h-full rounded-full transition-all duration-300"
                           style={{ width: `${attendancePercent}%` }}
@@ -609,7 +611,7 @@ const EventsPanel = () => {
                       {/* My Attendance Badge or Quick Action */}
                       <div className="pt-1 flex items-center justify-between">
                         <span className="text-[10px] uppercase font-bold text-vgsgray tracking-wider">
-                          Mi Asistencia:
+                          My Attendance:
                         </span>
 
                         {isPendingMyAttendance ? (
@@ -622,9 +624,8 @@ const EventsPanel = () => {
                               onClick={() =>
                                 handleQuickAttendance(event.id, true)
                               }
-                              className="py-0.5 px-2 text-[10px] font-bold shadow-xs"
                             >
-                              {isCurrentActionLoading ? "..." : "Asistí"}
+                              {isCurrentActionLoading ? "..." : "Attended"}
                             </Button>
                             <Button
                               variant="gray"
@@ -634,9 +635,9 @@ const EventsPanel = () => {
                               onClick={() =>
                                 handleQuickAttendance(event.id, false)
                               }
-                              className="py-0.5 px-2 text-[10px] hover:text-vgsred"
+                              className="hover:text-vgsred"
                             >
-                              {isCurrentActionLoading ? "..." : "No asistí"}
+                              {isCurrentActionLoading ? "..." : "Did not attend"}
                             </Button>
                           </div>
                         ) : (
@@ -651,41 +652,38 @@ const EventsPanel = () => {
                             size="xs"
                           >
                             {event.my_attendance_status === "attended"
-                              ? "✓ Asististe"
+                              ? "✓ Attended"
                               : event.my_attendance_status === "absent"
-                              ? "Ausente"
-                              : "Pendiente"}
+                              ? "Absent"
+                              : "Pending"}
                           </Badge>
                         )}
                       </div>
                     </div>
                   </div>
-
-                  {/* Card Footer Actions */}
-                  <div className="px-5 py-3 bg-gray-50 border-t border-vgsgray/20 flex items-center justify-between gap-2">
+                  <div className="px-5 py-3 bg-vgsgray/5 border-t border-vgsgray/15 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Button
                         variant="transparent"
+                        size="md"
                         icon={faEye}
                         animation="pop"
                         onClick={() => setDetailEventId(event.id)}
-                        className="text-xs font-semibold hover:text-vgsdarkblue p-0"
                       >
-                        Detalles y Asistencia
+                        Details
                       </Button>
 
                       {hasMeeting && event.meeting_code && (
                         <Button
                           variant="blue"
-                          size="xs"
+                          size="md"
                           animation="shrink"
                           icon={
                             event.meeting_type === "audio" ? faHeadset : faVideo
                           }
                           onClick={() => joinMeeting(event.meeting_code)}
-                          className="py-1 px-2.5 text-[11px] font-bold shadow-xs bg-vgsdarkblue text-white"
                         >
-                          Unirse a Llamada
+                          Join
                         </Button>
                       )}
                     </div>
@@ -694,22 +692,24 @@ const EventsPanel = () => {
                       <div className="flex items-center gap-1">
                         <Button
                           variant="gray"
+                          size="md"
                           icon={faEdit}
                           animation="shrink"
                           onClick={() => {
                             setEditingEvent(event);
                             setIsFormOpen(true);
                           }}
-                          className="px-2 py-1 text-xs"
-                          title="Editar evento"
+                          className="hover:text-vgsred"
+                          title="Edit event"
                         />
                         <Button
                           variant="gray"
+                          size="md"
                           icon={faTrash}
                           animation="shrink"
                           onClick={() => setDeleteEventTarget(event)}
-                          className="px-2 py-1 text-xs hover:text-vgsred"
-                          title="Eliminar evento"
+                          className="hover:text-vgsred"
+                          title="Delete event"
                         />
                       </div>
                     )}
@@ -730,7 +730,7 @@ const EventsPanel = () => {
           onPageChange={handlePageChange}
           totalRecords={pagination.total}
           currentCount={filteredEvents.length}
-          unit="eventos"
+          unit="events"
         />
       )}
 
@@ -764,66 +764,58 @@ const EventsPanel = () => {
           }
         />
       )}
-
-      {/* Delete Confirmation Box */}
       <ConfirmationBox
         isOpen={!!deleteEventTarget}
         onClose={() => setDeleteEventTarget(null)}
         onConfirm={handleDeleteConfirm}
         loading={isDeleting}
-        title="Eliminar Evento"
-        description={`¿Estás seguro de eliminar el evento "${deleteEventTarget?.title}"?`}
-        description2="Esta acción eliminará el evento y todos sus registros de asistencia asociados de forma permanente."
-        confirmText="Sí, Eliminar"
-        cancelText="Cancelar"
+        title="Delete Event"
+        description={`Are you sure you want to delete the event "${deleteEventTarget?.title}"?`}
+        description2="This action will permanently delete the event and all associated attendance records."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
         variant="rec"
         icon={faTrash}
       />
-
-      {/* Join with Code Modal */}
       <AnimatePresence>
         {isJoinCodeModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-vgsblack/60 backdrop-blur-xs flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full border border-vgsgray/20 space-y-4"
+              className="bg-vgswhite rounded-2xl p-6 shadow-[0_12px_40px_rgb(12,34,75,0.1)] max-w-sm w-full border border-vgsgray/20 space-y-4"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-vgsdarkblue/10 flex items-center justify-center text-vgsdarkblue">
                     <FontAwesomeIcon icon={faRightToBracket} />
                   </div>
-                  <h3 className="font-bold text-vgsdarkblue text-base">
-                    Unirse con Código
+                  <h3 className="font-bold text-vgsdarkblue">
+                    Join with Code
                   </h3>
                 </div>
-                <button
-                  type="button"
+                <Button
+                  variant="transparent"
+                  size="sm"
+                  icon={faXmark}
+                  animation="shrink"
                   onClick={() => setIsJoinCodeModalOpen(false)}
-                  className="text-vgsgray hover:text-vgsblack transition-colors"
-                >
-                  <FontAwesomeIcon icon={faXmark} />
-                </button>
+                />
               </div>
 
-              <p className="text-xs text-vgsgray">
-                Ingresa el código alfanumérico de la sala de reunión (ej.{" "}
-                <span className="font-mono font-semibold text-vgsdarkblue">
-                  clk-abc-xyz
-                </span>
-                ).
+              <p className="text-sm text-vgsdarkblue font-medium">
+                Enter the meeting room code.
               </p>
 
               <form onSubmit={handleJoinWithCode} className="space-y-4">
                 <Input
-                  label="Código de la reunión"
+                  label="Meeting Code"
                   placeholder="clk-xxxx-xxx"
                   value={joinCodeInput}
                   onChange={(e) => setJoinCodeInput(e.target.value)}
@@ -833,19 +825,20 @@ const EventsPanel = () => {
 
                 <div className="flex justify-end gap-2 pt-2">
                   <Button
-                    type="button"
                     variant="gray"
+                    size="md"
                     onClick={() => setIsJoinCodeModalOpen(false)}
                   >
-                    Cancelar
+                    Cancel
                   </Button>
                   <Button
                     type="submit"
                     variant="blue"
+                    size="md"
                     disabled={!joinCodeInput.trim()}
                     icon={faRightToBracket}
                   >
-                    Unirse a la Sala
+                    Join
                   </Button>
                 </div>
               </form>

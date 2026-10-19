@@ -81,7 +81,7 @@ const TypeSelector = memo(({ selectedType, onSelect }) => (
         return (
           <Button
             key={t.id}
-            variant="none"
+            variant="transparent"
             onClick={() => onSelect(t.id)}
             role="radio"
             aria-checked={isSelected}
