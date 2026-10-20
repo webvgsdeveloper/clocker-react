@@ -62,38 +62,49 @@ graph TD
 
 ### 1. WebRTC 1:1 Audio & Video Call Lifecycle
 
-Direct peer-to-peer communication uses Socket.io as an out-of-band signaling mechanism to exchange SDP offers, answers, and ICE candidates without an intermediary media server.
+A 1:1 peer-to-peer call works in **4 simple steps**. The server (Socket.io) acts only as an initial messenger to "introduce" the peers; once connected, audio and video stream **directly between both browsers (P2P)** without consuming server media bandwidth.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Caller as Caller Client
-    participant Socket as Socket.io Gateway
-    actor Callee as Callee Client
+    actor A as User A (Caller)
+    participant Server as Signaling Server (Socket.io)
+    actor B as User B (Callee)
 
-    Caller->>Caller: Capture local media stream (getUserMedia)
-    Caller->>Socket: emit("call_user", { userToCall, signalData, from, isVideo })
-    Socket->>Callee: emit("incoming_call", { signal, from, isVideo })
-    
-    alt Callee is Busy
-        Callee-->>Socket: emit("user_busy", { to: callerId })
-        Socket-->>Caller: emit("call_busy")
-        Caller->>Caller: Play busy tone & teardown peer
-    else Callee Accepts
-        Callee->>Callee: Capture local media stream & stop ringtone
-        Callee->>Socket: emit("accept_call", { signal, to: callerId })
-        Socket->>Caller: emit("call_accepted", signal)
-        Caller->>Caller: Initialize Simple-Peer (Initiator)
-        Caller<<->>Callee: Direct P2P WebRTC Media Stream (SRTP/DTLS)
+    %% 1. Call Initiation
+    rect rgb(240, 245, 255)
+    note over A, B: 1. Calling & Ringing (Signaling)
+    A->>Server: Start call to User B
+    Server->>B: Incoming call notification (Ringing)
     end
 
-    opt Terminate Call
-        Caller->>Socket: emit("end_call", { to: calleeId })
-        Socket->>Callee: emit("call_ended")
-        Caller->>Caller: Stop tracks & release camera/mic
-        Callee->>Callee: Stop tracks & release camera/mic
+    %% 2. Acceptance
+    rect rgb(240, 255, 240)
+    note over A, B: 2. Call Acceptance & Handshake
+    B->>Server: Accept call
+    Server->>A: Notify call accepted
+    end
+
+    %% 3. Direct Audio & Video
+    rect rgb(255, 250, 230)
+    note over A, B: 3. Direct Media Stream (P2P WebRTC)
+    A<<-->>B: Real-time Audio & Video (Direct browser-to-browser, bypassing server)
+    end
+
+    %% 4. Hang up
+    rect rgb(255, 240, 240)
+    note over A, B: 4. Termination
+    A->>Server: Hang up call (or User B)
+    Server->>B: Notify call ended
+    note over A, B: Release camera and microphone
     end
 ```
+
+#### How this flow works:
+1. **Calling & Ringing:** **User A** initiates the call. The Socket.io server forwards the invitation to **User B**, triggering ringtones and the incoming call dialog.
+2. **Acceptance:** When **User B** clicks *"Accept"*, both clients exchange connection metadata (SDP offer/answer) through the signaling server.
+3. **Direct P2P Media Stream:** Once paired, the server steps aside. Audio, video, and screen sharing stream directly between the two browsers with ultra-low latency.
+4. **Termination:** When either user hangs up, the server notifies the other party, and both devices immediately release camera and microphone hardware tracks.
 
 ### 2. Live Status & Shift Synchronization Flow
 
