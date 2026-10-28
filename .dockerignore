@@ -17,7 +17,7 @@ pnpm-debug.log*
 .git/
 .gitignore
 
-# Environment variables (provided at build-time via Docker ARG / Coolify Build Args)
+# Environment variables
 .env
 .env.*
 !.env.example
