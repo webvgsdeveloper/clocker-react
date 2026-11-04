@@ -33,22 +33,14 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Documentation & AI context (not required for Vite compilation)
+# AI
 *.md
 GEMINI.md
 .gemini/
 .geminiignore
 .agents/
 AGENTS.md
-
-# Testing & Browser Automation
 .playwright-mcp/
 coverage/
 
-# Certificates, Keys & Secrets
-*.pem
-*.key
-*.crt
-
-# Temporary files
 *.local
