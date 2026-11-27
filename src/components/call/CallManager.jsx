@@ -1,5 +1,5 @@
 // src/components/call/CallManager.jsx
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCall } from "../../contexts/CallContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -122,18 +122,16 @@ const CallManager = () => {
   };
 
   // Check if remote video track is active (matches MeetingRoom pattern)
-  const hasRemoteVideo = useMemo(() => {
-    if (callType !== "video" || !remoteStream) return false;
-    const tracks = remoteStream.getVideoTracks();
-    return tracks.length > 0 && tracks.some((t) => t.enabled);
-  }, [callType, remoteStream, streamVersion]);
+  const hasRemoteVideo =
+    callType === "video" &&
+    Boolean(remoteStream) &&
+    remoteStream.getVideoTracks().some((t) => t.enabled);
 
   // Check if local video track is active
-  const hasLocalVideo = useMemo(() => {
-    if (isCamOff || !stream) return false;
-    const tracks = stream.getVideoTracks();
-    return tracks.length > 0 && tracks.some((t) => t.enabled);
-  }, [isCamOff, stream]);
+  const hasLocalVideo =
+    !isCamOff &&
+    Boolean(stream) &&
+    stream.getVideoTracks().some((t) => t.enabled);
 
   return (
     <>

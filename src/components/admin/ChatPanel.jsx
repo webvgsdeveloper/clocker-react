@@ -75,7 +75,7 @@ const ContactListItem = memo(({ contact, isSelected, onClick }) => (
     <div className="flex items-center gap-1">
       <StatusBadge status={contact.user_status} />
       {contact.unread_count > 0 && (
-        <span className="bg-vgsred text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">
+        <span className="bg-vgsred text-vgswhite text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">
           {contact.unread_count}
         </span>
       )}
