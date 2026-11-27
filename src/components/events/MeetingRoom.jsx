@@ -5,7 +5,6 @@ import { useMeeting } from "../../contexts/MeetingContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "../common/Button";
-import Badge from "../common/Badge";
 import {
   faMicrophone,
   faMicrophoneSlash,
@@ -17,7 +16,6 @@ import {
   faCheck,
   faExpand,
   faCompress,
-  faHeadset,
   faTableCellsLarge,
   faTableColumns,
   faWindowMaximize,
